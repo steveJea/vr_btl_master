@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR BATTLE MASTERS - VIOLENCE ROYALE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Anton&amp;family=Inter:wght@400;600&amp;family=Press+Start+2P&amp;display=swap');
+        
+        :root {
+            --blood-red: #b91c1c;
+            --dark-red: #7f1d1d;
+            --gold: #fbbf24;
+            --brutal-black: #0a0a0a;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .title-font {
+            font-family: 'Anton', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            letter-spacing: 2px;
+        }
+        
+        .brutal-font {
+            font-family: 'Press Start 2P', system_ui;
+            letter-spacing: 1px;
+        }
+        
+        .game-bg {
+            background: linear-gradient(180deg, #0a0a0a 0%, #1a0f0f 50%, #0a0a0a 100%);
+        }
+        
+        .section {
+            display: none !important;
+        }
+        
+        .section.active {
+            display: block !important;
+        }
+        
+        .card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        
+        .card.selected {
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.3);
+            transform: scale(1.03);
+        }
+        
+        .card.grade-NORMAL { border-color: #64748b; }
+        .card.grade-RARE { border-color: #3b82f6; }
+        .card.grade-HIGH_RARE { border-color: #8b5cf6; }
+        .card.grade-SUPER_RARE { border-color: #ec4899; }
+        .card.grade-ULTRA_RARE { border-color: #f59e0b; }
+        .card.grade-MYTHIC_RARE { border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+        
+        .brutal-border {
+            border: 3px solid #334155;
+        }
+        
+        .neon-red {
+            text-shadow: 0 0 10px #b91c1c, 0 0 20px #b91c1c;
+        }
+        
+        .gold-glow {
+            box-shadow: 0 0 15px #fbbf24, 0 0 30px #fbbf24;
+            animation: gold-pulse 1.5s infinite ease-in-out;
+        }
+        
+        .red-glow {
+            box-shadow: 0 0 15px #ef4444, 0 0 30px #ef4444;
+        }
+        
+        .cracked {
+            position: relative;
+        }
+        
+        .cracked::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                linear-gradient(45deg, transparent 40%, rgba(239, 68, 68, 0.6) 40%, rgba(239, 68, 68, 0.6) 42%, transparent 42%),
+                linear-gradient(-45deg, transparent 58%, rgba(239, 68, 68, 0.5) 58%, rgba(239, 68, 68, 0.5) 60%, transparent 60%);
+            background-size: 20px 20px;
+            pointer-events: none;
+            animation: crack-appear 0.4s ease-out forwards;
+            z-index: 2;
+        }
+        
+        @keyframes crack-appear {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes gold-pulse {
+            0%, 100% { box-shadow: 0 0 15px #fbbf24, 0 0 30px #fbbf24; }
+            50% { box-shadow: 0 0 25px #fbbf24, 0 0 45px #fbbf24; }
+        }
+        
+        .battle-card {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+        }
+        
+        .vs-impact {
+            animation: impact-shake 0.6s ease-in-out;
+        }
+        
+        @keyframes impact-shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px) rotate(-1deg); }
+            40% { transform: translateX(8px) rotate(1deg); }
+            60% { transform: translateX(-4px) rotate(-0.5deg); }
+            80% { transform: translateX(4px) rotate(0.5deg); }
+        }
+        
+        .stat-bar {
+            height: 6px;
+            background: linear-gradient(to right, #b91c1c, #fbbf24);
+            transition: width 0.6s ease;
+        }
+        
+        .used-card {
+            transition: all 0.3s ease;
+            filter: brightness(0.85);
+        }
+        
+        .used-card.win {
+            filter: brightness(1.1) saturate(1.3);
+            box-shadow: 0 0 12px #fbbf24;
+        }
+        
+        .used-card.lose {
+            filter: brightness(0.7) saturate(0.7);
+            box-shadow: 0 0 12px #ef4444;
+        }
+        
+        .modal {
+            animation: modal-pop 0.2s ease-out forwards;
+        }
+        
+        @keyframes modal-pop {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        
+        .game-container {
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        
+        .card-portrait {
+            background-size: cover;
+            background-position: center;
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.6);
+        }
+        
+        .brutal-text {
+            text-shadow: 2px 2px 0px #000, -1px -1px 0px #000;
+        }
+        
+        .deck-grid {
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #1e2937;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-white game-bg min-h-screen overflow-x-hidden">
+    <!-- Header -->
+    <div class="border-b border-zinc-800 bg-black/60 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-x-3">
+                <div class="w-10 h-10 bg-red-600 flex items-center justify-center rounded">
+                    <i class="fa-solid fa-skull text-2xl"></i>
+                </div>
+                <div>
+                    <span class="title-font text-2xl tracking-[3px] font-bold">VIOLENCE ROYALE</span>
+                    <span class="text-xs text-red-500 block -mt-1 tracking-[2px]">THE BRUTAL CITY</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-x-4 text-sm">
+                <div onclick="showMain()" class="cursor-pointer flex items-center gap-x-2 px-4 py-1.5 hover:bg-zinc-900 rounded-lg transition-colors">
+                    <i class="fa-solid fa-home text-red-500"></i>
+                    <span class="font-medium">HOME</span>
+                </div>
+                <div class="px-3 py-1 bg-zinc-900 rounded text-xs flex items-center gap-x-1.5 border border-zinc-700">
+                    <i class="fa-solid fa-database text-emerald-400"></i>
+                    <span class="text-emerald-400 text-[10px]">VRB_DATA v2.1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SCREEN -->
+    <div id="main-screen" class="section active min-h-[calc(100vh-73px)] flex items-center justify-center relative">
+        <div class="text-center px-6 max-w-4xl">
+            <!-- Logo / Title -->
+            <div class="mb-8">
+                <div class="inline-flex items-center gap-x-4 mb-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center rounded-2xl shadow-2xl shadow-red-900/50">
+                        <i class="fa-solid fa-fist-raised text-white text-5xl"></i>
+                    </div>
+                </div>
+                
+                <h1 class="title-font text-[92px] leading-[78px] tracking-[-2px] font-black mb-1">
+                    <span class="bg-gradient-to-r from-red-500 via-red-600 to-red-500 bg-clip-text text-transparent">VIOLENCE</span><br>
+                    <span class="text-white">ROYALE</span>
+                </h1>
+                <div class="text-red-500 text-3xl tracking-[8px] font-bold mb-2 -mt-3">THE BRUTAL CITY</div>
+                <div class="text-6xl title-font tracking-[6px] text-white/90">BATTLE MASTERS</div>
+            </div>
+
+            <div class="max-w-md mx-auto mb-10">
+                <p class="text-zinc-400 text-lg">카드의 힘으로 잔혹한 도시를 지배하라.<br>POWER가 모든 것을 결정한다.</p>
+            </div>
+
+            <!-- Start Button -->
+            <button onclick="startGame()" 
+                    class="group relative inline-flex items-center justify-center px-14 py-5 bg-red-600 hover:bg-red-500 active:bg-red-700 transition-all rounded-2xl text-2xl font-bold tracking-widest shadow-xl shadow-red-900/40 hover:shadow-red-900/60">
+                <span class="flex items-center gap-x-3">
+                    <i class="fa-solid fa-play mr-1 group-active:scale-90 transition"></i>
+                    <span>PRESS ANY KEY TO START</span>
+                </span>
+            </button>
+            
+            <div class="mt-8 text-[10px] text-zinc-500 tracking-[1px]">5장 / 10장 / 20장 배틀 • 전략적 카드 매칭</div>
+        </div>
+        
+        <!-- Decorative bottom bar -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-x-8 text-xs text-zinc-600">
+            <div class="flex items-center gap-x-1.5"><i class="fa-solid fa-skull"></i> <span>600+ IPS</span></div>
+            <div class="flex items-center gap-x-1.5"><i class="fa-solid fa-bolt"></i> <span>REAL-TIME POWER</span></div>
+        </div>
+    </div>
+
+    <!-- CHOICE GAME SCREEN -->
+    <div id="choice-screen" class="section min-h-[calc(100vh-73px)] flex items-center justify-center py-12">
+        <div class="max-w-5xl w-full px-6">
+            <div class="text-center mb-10">
+                <div class="text-red-500 text-sm tracking-[3px] font-bold mb-1">SELECT GAME MODE</div>
+                <h2 class="title-font text-6xl tracking-tight">게임 방식을 선택하세요</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 5 VS 5 -->
+                <div onclick="selectGameMode(5)" class="group cursor-pointer bg-zinc-900 border border-zinc-700 hover:border-red-600 rounded-3xl p-8 transition-all active:scale-[0.985]">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <div class="text-6xl font-black title-font tracking-tighter text-white group-hover:text-red-500 transition">5</div>
+                            <div class="text-3xl font-bold tracking-tight -mt-2">VS 5</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="inline-block px-4 py-1 bg-emerald-500/10 text-emerald-400 text-xs font-bold rounded">EASY</div>
+                        </div>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span class="text-zinc-400">NORMAL</span><span class="font-mono">2</span></div>
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span class="text-zinc-400">RARE</span><span class="font-mono">1</span></div>
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span class="text-zinc-400">HIGH RARE</span><span class="font-mono">1</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-400">ULTRA RARE</span><span class="font-mono">1</span></div>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-white/10 text-xs text-center text-zinc-500">총 5장 • 빠른 배틀</div>
+                </div>
+
+                <!-- 10 VS 10 -->
+                <div onclick="selectGameMode(10)" class="group cursor-pointer bg-zinc-900 border border-zinc-700 hover:border-red-600 rounded-3xl p-8 transition-all active:scale-[0.985] relative">
+                    <div class="absolute -top-2 -right-2 bg-red-600 text-[10px] px-3 py-0.5 rounded font-bold tracking-wider">RECOMMENDED</div>
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <div class="text-6xl font-black title-font tracking-tighter text-white group-hover:text-red-500 transition">10</div>
+                            <div class="text-3xl font-bold tracking-tight -mt-2">VS 10</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="inline-block px-4 py-1 bg-amber-500/10 text-amber-400 text-xs font-bold rounded">NORMAL</div>
+                        </div>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span class="text-zinc-400">NORMAL</span><span class="font-mono">5</span></div>
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span class="text-zinc-400">RARE</span><span class="font-mono">2</span></div>
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span class="text-zinc-400">HIGH RARE</span><span class="font-mono">1</span></div>
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span class="text-zinc-400">SUPER RARE</span><span class="font-mono">1</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-400">ULTRA RARE</span><span class="font-mono">1</span></div>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-white/10 text-xs text-center text-zinc-500">총 10장 • 균형 잡힌 전략</div>
+                </div>
+
+                <!-- 20 VS 20 -->
+                <div onclick="selectGameMode(20)" class="group cursor-pointer bg-zinc-900 border border-zinc-700 hover:border-red-600 rounded-3xl p-8 transition-all active:scale-[0.985]">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <div class="text-6xl font-black title-font tracking-tighter text-white group-hover:text-red-500 transition">20</div>
+                            <div class="text-3xl font-bold tracking-tight -mt-2">VS 20</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="inline-block px-4 py-1 bg-red-500/10 text-red-400 text-xs font-bold rounded">HARD</div>
+                        </div>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span class="text-zinc-400">NORMAL</span><span class="font-mono">10</span></div>
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span class="text-zinc-400">RARE</span><span class="font-mono">4</span></div>
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span class="text-zinc-400">HIGH RARE</span><span class="font-mono">2</span></div>
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span class="text-zinc-400">SUPER RARE</span><span class="font-mono">2</span></div>
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span class="text-zinc-400">ULTRA RARE</span><span class="font-mono">1</span></div>
+                        <div class="flex justify-between"><span class="text-zinc-400">MYTHIC RARE</span><span class="font-mono text-red-400">1</span></div>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-white/10 text-xs text-center text-zinc-500">총 20장 • 최후의 결전</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DECK PREP / CARD CONFIRM SCREEN -->
+    <div id="deck-screen" class="section min-h-[calc(100vh-73px)] py-8">
+        <div class="max-w-7xl mx-auto px-6">
+            <!-- Header -->
+            <div class="flex items-end justify-between mb-6">
+                <div>
+                    <div class="flex items-center gap-x-3">
+                        <span class="px-4 py-1 bg-red-600 text-xs font-bold tracking-widest rounded">DECK PREPARATION</span>
+                        <span id="mode-badge" class="text-2xl font-bold"></span>
+                    </div>
+                    <div class="text-zinc-400 mt-1">덱을 확인하고 필요하면 <span class="text-amber-400">3회까지 교체</span>할 수 있습니다.</div>
+                </div>
+                
+                <div class="flex items-center gap-x-3">
+                    <!-- Change button -->
+                    <button onclick="changeDeck()" id="change-btn"
+                            class="flex items-center gap-x-2 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 hover:border-amber-500 transition rounded-2xl text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed">
+                        <i class="fa-solid fa-sync-alt"></i>
+                        <span>덱 변경 <span id="change-count">3/3</span></span>
+                    </button>
+                    
+                    <button onclick="confirmDeck()" 
+                            class="flex items-center gap-x-3 px-8 py-3.5 bg-red-600 hover:bg-red-500 active:bg-red-700 transition rounded-2xl font-bold text-lg shadow-lg shadow-red-900/30">
+                        <span>덱 확인 및 배틀 시작</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Deck Stats -->
+            <div class="flex items-center gap-x-6 mb-4 text-sm">
+                <div class="flex items-center gap-x-2 bg-zinc-900 px-4 h-9 rounded-2xl border border-zinc-700">
+                    <span class="text-zinc-400">총 카드</span> 
+                    <span id="deck-total" class="font-mono text-xl font-bold text-white">5</span>
+                </div>
+                <div id="grade-summary" class="flex gap-x-2 text-xs"></div>
+            </div>
+
+            <!-- Cards Grid -->
+            <div id="deck-grid" 
+                 class="deck-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4 pb-8">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- BATTLE ARENA -->
+    <div id="battle-screen" class="section min-h-[calc(100vh-73px)] py-6">
+        <div class="max-w-[1180px] mx-auto px-5">
+            
+            <!-- Battle Header -->
+            <div class="flex items-center justify-between mb-4 px-1">
+                <div class="flex items-center gap-x-4">
+                    <div>
+                        <span class="text-xs text-red-500 font-bold tracking-[1.5px]">BATTLE IN PROGRESS</span>
+                        <div class="flex items-baseline gap-x-2">
+                            <span id="battle-progress" class="text-4xl font-black title-font tracking-tighter">01 / 05</span>
+                            <span class="text-red-400 text-sm">BATTLES</span>
+                        </div>
+                    </div>
+                    
+                    <div class="px-5 py-2 bg-zinc-900 border border-zinc-700 rounded-2xl flex items-center gap-x-6 text-sm">
+                        <div>
+                            <span class="text-emerald-400 font-bold">WIN</span> 
+                            <span id="win-count" class="font-mono text-2xl font-bold ml-1">0</span>
+                        </div>
+                        <div class="w-px h-4 bg-white/20"></div>
+                        <div>
+                            <span class="text-red-400 font-bold">LOSE</span> 
+                            <span id="lose-count" class="font-mono text-2xl font-bold ml-1">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-right">
+                    <div class="text-xs text-zinc-500">REMAINING</div>
+                    <div class="font-mono text-3xl font-bold"><span id="remaining-count">5</span> <span class="text-xs align-super text-zinc-400">/ <span id="total-battles">5</span></span></div>
+                </div>
+            </div>
+
+            <!-- Opponent Area -->
+            <div class="mb-3">
+                <div class="flex items-center justify-between mb-2 px-2">
+                    <div class="flex items-center gap-x-2 text-red-400">
+                        <i class="fa-solid fa-user-secret"></i>
+                        <span class="font-bold text-sm tracking-wider">OPPONENT DECK</span>
+                    </div>
+                    <div class="text-[10px] text-zinc-500">HIDDEN • POWER UNKNOWN</div>
+                </div>
+                
+                <!-- Opponent remaining + used -->
+                <div class="flex gap-x-3 items-end">
+                    <!-- Used opponent cards -->
+                    <div id="opp-used" class="flex gap-x-1.5 min-w-[120px] flex-wrap content-end h-[78px] pr-3 border-r border-zinc-700">
+                        <!-- JS populated small used cards -->
+                    </div>
+                    
+                    <!-- Remaining opponent cards (face down) -->
+                    <div id="opp-remaining" class="flex gap-x-2 flex-1 overflow-x-auto pb-1 deck-grid">
+                        <!-- JS: face down cards -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- VS / Battle Zone -->
+            <div class="relative bg-zinc-900 border border-zinc-700 rounded-3xl p-6 mb-4 min-h-[280px] flex items-center justify-center overflow-hidden" id="vs-zone">
+                <div id="vs-content" class="w-full max-w-[820px]">
+                    <!-- Dynamic content: idle / countdown / result -->
+                    <div id="vs-idle" class="text-center py-8">
+                        <div class="mx-auto w-16 h-16 bg-zinc-800 rounded-2xl flex items-center justify-center mb-4 border border-zinc-600">
+                            <i class="fa-solid fa-question text-4xl text-zinc-400"></i>
+                        </div>
+                        <p class="text-zinc-400">아래에서 카드를 선택하여 배틀을 시작하세요</p>
+                        <p class="text-xs text-zinc-500 mt-1">선택한 카드의 POWER가 상대 카드보다 높으면 승리합니다</p>
+                    </div>
+                    
+                    <div id="vs-countdown" class="hidden text-center">
+                        <div class="text-[92px] font-black tabular-nums title-font tracking-[-6px] text-red-500" id="countdown-num">3</div>
+                        <div class="text-red-400 text-sm -mt-3 tracking-[4px] font-bold">VS</div>
+                    </div>
+                    
+                    <div id="vs-battle" class="hidden">
+                        <div class="flex items-center justify-center gap-x-8">
+                            <!-- My Card in VS -->
+                            <div class="text-center w-[210px]">
+                                <div class="text-xs text-emerald-400 mb-1 font-bold tracking-wider">YOUR CARD</div>
+                                <div id="vs-my-card" class="battle-card mx-auto w-[190px] bg-zinc-800 border-2 border-emerald-500 rounded-2xl overflow-hidden shadow-xl">
+                                    <!-- populated by JS -->
+                                </div>
+                            </div>
+                            
+                            <!-- VS Text -->
+                            <div class="pt-8">
+                                <div class="text-7xl font-black title-font tracking-[-4px] text-white/70">VS</div>
+                            </div>
+                            
+                            <!-- Opp Card in VS -->
+                            <div class="text-center w-[210px]">
+                                <div class="text-xs text-red-400 mb-1 font-bold tracking-wider">OPPONENT</div>
+                                <div id="vs-opp-card" class="battle-card mx-auto w-[190px] bg-zinc-800 border-2 border-red-500 rounded-2xl overflow-hidden shadow-xl">
+                                    <!-- populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Result stamp -->
+                        <div id="battle-result-stamp" class="hidden mt-6 text-center">
+                            <div id="result-text" class="inline-block px-10 py-1 text-4xl font-black tracking-[3px]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Hand -->
+            <div>
+                <div class="flex justify-between items-center mb-2 px-2">
+                    <div class="flex items-center gap-x-2">
+                        <span class="font-bold text-emerald-400">YOUR HAND</span>
+                        <span id="hand-count" class="text-xs px-2 py-px bg-emerald-900/60 text-emerald-300 rounded">5 cards remaining</span>
+                    </div>
+                    <div class="text-xs text-zinc-500">클릭하여 카드 선택 → DEPLOY</div>
+                </div>
+                
+                <div id="my-hand" class="flex gap-x-3 overflow-x-auto pb-4 deck-grid snap-x">
+                    <!-- Populated dynamically with selectable cards -->
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result-screen" class="section py-10 min-h-[calc(100vh-73px)]">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-8">
+                <div id="final-result-text" class="text-7xl font-black title-font tracking-tighter mb-1"></div>
+                <div id="final-score" class="text-3xl font-mono text-zinc-300"></div>
+            </div>
+
+            <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-8 mb-8">
+                <div class="flex justify-between items-center mb-6 px-2">
+                    <div class="font-bold text-lg">배틀 기록</div>
+                    <div onclick="restartGame()" class="cursor-pointer flex items-center gap-x-2 text-sm px-5 py-2 hover:bg-zinc-800 border border-zinc-600 rounded-2xl transition">
+                        <i class="fa-solid fa-redo"></i>
+                        <span>다시 플레이</span>
+                    </div>
+                </div>
+                
+                <div id="battle-log" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Populated by JS: each battle result -->
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <button onclick="restartGame()" 
+                        class="px-10 py-4 bg-white text-black font-bold rounded-2xl hover:bg-zinc-200 active:bg-white transition flex items-center gap-x-3 mx-auto text-lg">
+                    <i class="fa-solid fa-home"></i>
+                    <span>메인으로 돌아가기</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Info Modal -->
+    <div id="card-modal" onclick="if (event.target.id === 'card-modal') hideCardModal()" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-6">
+        <div onclick="event.stopImmediatePropagation()" class="modal bg-zinc-900 border border-zinc-700 max-w-md w-full rounded-3xl overflow-hidden">
+            <!-- Modal content populated by JS -->
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== TAILWIND CONFIG ====================
+        function initTailwind() {
+            document.documentElement.style.setProperty('--accent', '#b91c1c');
+            
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            'title': ['Anton', 'Impact', 'system-ui', 'sans-serif']
+                        }
+                    }
+                }
+            };
+        }
+
+        // ==================== CARD DATA (VRB_DATA) ====================
+        // 현재는 PDF 명세에 맞춘 샘플 데이터 32장 사용 중.
+        // 실제 GitHub 데이터 연동 방법:
+        // 1. https://github.com/steveJea/vr-ideal-worldcup 의 index.html 열기
+        // 2. 브라우저 개발자도구(Console)에서 cardPool 또는 cards 배열 복사
+        // 3. 아래 cardPool = [...] 부분을 실제 데이터로 교체
+        // 또는 fetch로 동적 로드 가능 (CORS 주의)
+        let cardPool = [
+            { id: 1000100001, name: "Alice", gender: "female", age: 14, region: "강남구", grade: "RARE", class: "ICE", attribute: "SUPPORT", power: 42, img: "https://picsum.photos/id/1005/300/380", desc: "차가운 미소 뒤에 숨겨진 복수의 칼날. 14세 소녀의 얼음 같은 침착함." },
+            { id: 1000100002, name: "Rage Kim", gender: "male", age: 19, region: "신도림", grade: "HIGH RARE", class: "STREET", attribute: "ASSAULT", power: 67, img: "https://picsum.photos/id/1011/300/380", desc: "폭력의 화신. 주먹 하나로 지역을 장악한 19세의 맹수." },
+            { id: 1000100003, name: "Witch Girl", gender: "female", age: 17, region: "홍대", grade: "SUPER RARE", class: "CURSE", attribute: "SUPPORT", power: 81, img: "https://picsum.photos/id/1009/300/380", desc: "붉은 머리의 저주술사. 적의 정신을 갉아먹는 존재." },
+            { id: 1000100004, name: "Shadow Jin", gender: "male", age: 16, region: "가산디지털", grade: "RARE", class: "STEALTH", attribute: "ASSAULT", power: 39, img: "https://picsum.photos/id/160/300/380", desc: "어둠 속에서 움직이는 소년. 배신과 암살의 전문가." },
+            { id: 1000100005, name: "Bloody Rose", gender: "female", age: 22, region: "이태원", grade: "HIGH RARE", class: "BLADE", attribute: "ASSAULT", power: 58, img: "https://picsum.photos/id/201/300/380", desc: "장미처럼 아름답고 가시처럼 날카로운 여성 파이터." },
+            { id: 1000100006, name: "Psycho J", gender: "male", age: 15, region: "구로", grade: "NORMAL", class: "PSYCHO", attribute: "ASSAULT", power: 28, img: "https://picsum.photos/id/29/300/380", desc: "미친 듯이 웃는 소년. 고통을 즐기는 잔혹한 천재." },
+            { id: 1000100007, name: "Neon Reaper", gender: "male", age: 21, region: "강북", grade: "ULTRA RARE", class: "CYBER", attribute: "ASSAULT", power: 94, img: "https://picsum.photos/id/251/300/380", desc: "네온 불빛 아래에서만 존재하는 전설의 사신." },
+            { id: 1000100008, name: "Silent Yuki", gender: "female", age: 13, region: "종로", grade: "RARE", class: "ICE", attribute: "SUPPORT", power: 35, img: "https://picsum.photos/id/40/300/380", desc: "말 없는 소녀. 그녀의 침묵이 가장 무서운 무기다." },
+            { id: 1000100009, name: "Iron Bull", gender: "male", age: 24, region: "영등포", grade: "HIGH RARE", class: "TANK", attribute: "DEFENSE", power: 71, img: "https://picsum.photos/id/48/300/380", desc: "철 같은 근육과 의지. 한 번 돌진하면 멈추지 않는다." },
+            { id: 1000100010, name: "Crimson Doll", gender: "female", age: 16, region: "압구정", grade: "SUPER RARE", class: "DOLL", attribute: "SUPPORT", power: 76, img: "https://picsum.photos/id/64/300/380", desc: "인형처럼 완벽한 외모. 속은 새빨간 독으로 가득 차 있다." },
+            { id: 1000100011, name: "Ghost Han", gender: "male", age: 18, region: "마포", grade: "NORMAL", class: "GHOST", attribute: "STEALTH", power: 22, img: "https://picsum.photos/id/1006/300/380", desc: "존재감 없는 남자. 이미 죽은 자처럼 움직인다." },
+            { id: 1000100012, name: "Viper Queen", gender: "female", age: 20, region: "청담", grade: "MYTHIC RARE", class: "POISON", attribute: "ASSAULT", power: 118, img: "https://picsum.photos/id/107/300/380", desc: "전설의 독사 여왕. 그녀의 한 번의 키스가 치명적이다." },
+            { id: 1000100013, name: "Zero", gender: "male", age: 17, region: "신림", grade: "HIGH RARE", class: "ZERO", attribute: "ASSAULT", power: 63, img: "https://picsum.photos/id/133/300/380", desc: "감정 없는 소년. 오직 승리만을 추구하는 기계 같은 존재." },
+            { id: 1000100014, name: "Lunar Fang", gender: "female", age: 15, region: "노원", grade: "RARE", class: "MOON", attribute: "SUPPORT", power: 47, img: "https://picsum.photos/id/180/300/380", desc: "달빛 아래에서만 빛나는 송곳니. 은밀하고 치명적." },
+            { id: 1000100015, name: "Mad Clown", gender: "male", age: 23, region: "동대문", grade: "SUPER RARE", class: "CLOWN", attribute: "ASSAULT", power: 85, img: "https://picsum.photos/id/201/300/380", desc: "웃음 뒤에 숨겨진 광기. 관객을 죽이는 광대." },
+            { id: 1000100016, name: "Steel Rose", gender: "female", age: 19, region: "서초", grade: "ULTRA RARE", class: "BLADE", attribute: "ASSAULT", power: 97, img: "https://picsum.photos/id/29/300/380", desc: "강철 장미. 아름다움과 파괴를 동시에 품은 여전사." },
+            { id: 1000100017, name: "Little Devil", gender: "male", age: 12, region: "강서", grade: "NORMAL", class: "DEVIL", attribute: "ASSAULT", power: 19, img: "https://picsum.photos/id/160/300/380", desc: "작지만 무서운 악마. 어린 나이에 이미 살인을 저질렀다." },
+            { id: 1000100018, name: "Phantom Blade", gender: "male", age: 25, region: "용산", grade: "HIGH RARE", class: "BLADE", attribute: "ASSAULT", power: 69, img: "https://picsum.photos/id/251/300/380", desc: "그림자처럼 사라지는 검사. 한 번 베이면 끝." },
+            { id: 1000100019, name: "Siren", gender: "female", age: 18, region: "한남", grade: "RARE", class: "SIREN", attribute: "SUPPORT", power: 44, img: "https://picsum.photos/id/1009/300/380", desc: "노래로 적을 유혹하는 치명적인 미녀." },
+            { id: 1000100020, name: "Bloodhound", gender: "male", age: 22, region: "성북", grade: "SUPER RARE", class: "BEAST", attribute: "ASSAULT", power: 79, img: "https://picsum.photos/id/48/300/380", desc: "피 냄새를 쫓는 사냥개. 한번 물면 놓지 않는다." },
+            { id: 1000100021, name: "Eclipse", gender: "female", age: 16, region: "관악", grade: "ULTRA RARE", class: "DARK", attribute: "SUPPORT", power: 91, img: "https://picsum.photos/id/107/300/380", desc: "태양을 가리는 존재. 그녀가 나타나면 세상이 어두워진다." },
+            { id: 1000100022, name: "Rusty Nail", gender: "male", age: 20, region: "중구", grade: "NORMAL", class: "STREET", attribute: "ASSAULT", power: 31, img: "https://picsum.photos/id/133/300/380", desc: "녹슨 못처럼 투박하고 위험한 남자." },
+            { id: 1000100023, name: "Queen of Thorns", gender: "female", age: 21, region: "강남구", grade: "MYTHIC RARE", class: "THORN", attribute: "ASSAULT", power: 125, img: "https://picsum.photos/id/180/300/380", desc: "가시 왕국의 여왕. 모든 것을 찢어버리는 존재." },
+            { id: 1000100024, name: "Void Walker", gender: "male", age: 17, region: "서대문", grade: "HIGH RARE", class: "VOID", attribute: "STEALTH", power: 66, img: "https://picsum.photos/id/201/300/380", desc: "공허 속을 걷는 자. 존재 자체가 불안정하다." },
+            { id: 1000100025, name: "Scarlet", gender: "female", age: 15, region: "동작", grade: "RARE", class: "BLOOD", attribute: "ASSAULT", power: 51, img: "https://picsum.photos/id/64/300/380", desc: "붉은 피를 사랑하는 소녀. 그녀의 손길은 항상 피로 젖어 있다." },
+            { id: 1000100026, name: "Titan", gender: "male", age: 26, region: "송파", grade: "SUPER RARE", class: "TANK", attribute: "DEFENSE", power: 88, img: "https://picsum.photos/id/251/300/380", desc: "거인의 힘을 가진 남자. 한 번의 주먹으로 건물을 부순다." },
+            { id: 1000100027, name: "Mimic", gender: "female", age: 14, region: "양천", grade: "NORMAL", class: "MIMIC", attribute: "SUPPORT", power: 25, img: "https://picsum.photos/id/29/300/380", desc: "타인의 얼굴을 훔치는 소녀. 진짜 모습을 아는 자는 없다." },
+            { id: 1000100028, name: "Ash Reaper", gender: "male", age: 23, region: "은평", grade: "ULTRA RARE", class: "ASH", attribute: "ASSAULT", power: 103, img: "https://picsum.photos/id/107/300/380", desc: "재 속에서 부활하는 사신. 죽음을 두려워하지 않는다." },
+            { id: 1000100029, name: "Nightmare", gender: "female", age: 17, region: "중랑", grade: "HIGH RARE", class: "DREAM", attribute: "SUPPORT", power: 72, img: "https://picsum.photos/id/160/300/380", desc: "악몽을 현실로 만드는 존재. 그녀를 만나면 잠들지 못한다." },
+            { id: 1000100030, name: "Jackal", gender: "male", age: 18, region: "강북", grade: "RARE", class: "BEAST", attribute: "ASSAULT", power: 55, img: "https://picsum.photos/id/48/300/380", desc: "사막의 승냥이처럼 잔인하고 빠른 사냥꾼." },
+            { id: 1000100031, name: "Doll Face", gender: "female", age: 12, region: "구로", grade: "NORMAL", class: "DOLL", attribute: "SUPPORT", power: 18, img: "https://picsum.photos/id/1005/300/380", desc: "인형 같은 얼굴의 소녀. 속은 완전한 공허." },
+            { id: 1000100032, name: "Thunder God", gender: "male", age: 27, region: "성동", grade: "MYTHIC RARE", class: "THUNDER", attribute: "ASSAULT", power: 132, img: "https://picsum.photos/id/201/300/380", desc: "번개의 신. 그의 주먹은 하늘의 분노를 담고 있다." },
+        ];
+
+        // Game State
+        let gameState = {
+            mode: 5,
+            playerDeck: [],
+            opponentDeck: [],
+            remainingPlayer: [],
+            remainingOpp: [],
+            usedPlayer: [],
+            usedOpp: [],
+            battleLog: [],
+            changeCount: 3,
+            currentBattle: 0,
+            wins: 0,
+            loses: 0,
+            selectedCardId: null,
+            isBattling: false
+        };
+
+        // ==================== UTILITY ====================
+        function getGradeColor(grade) {
+            const colors = {
+                "NORMAL": "slate",
+                "RARE": "blue",
+                "HIGH RARE": "violet",
+                "SUPER RARE": "pink",
+                "ULTRA RARE": "amber",
+                "MYTHIC RARE": "red"
+            };
+            return colors[grade] || "slate";
+        }
+
+        function getGradeBorder(grade) {
+            return `border-${getGradeColor(grade)}-500`;
+        }
+
+        function shuffleArray(array) {
+            const newArr = [...array];
+            for (let i = newArr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
+            }
+            return newArr;
+        }
+
+        function getCardsByGrade(grade) {
+            return cardPool.filter(c => c.grade === grade);
+        }
+
+        // Deal cards according to mode distribution
+        function dealCards(mode) {
+            const distribution = {
+                5:  { "NORMAL": 2, "RARE": 1, "HIGH RARE": 1, "SUPER RARE": 0, "ULTRA RARE": 1, "MYTHIC RARE": 0 },
+                10: { "NORMAL": 5, "RARE": 2, "HIGH RARE": 1, "SUPER RARE": 1, "ULTRA RARE": 1, "MYTHIC RARE": 0 },
+                20: { "NORMAL": 10, "RARE": 4, "HIGH RARE": 2, "SUPER RARE": 2, "ULTRA RARE": 1, "MYTHIC RARE": 1 }
+            };
+            
+            const dist = distribution[mode];
+            let dealt = [];
+            let availablePool = [...cardPool];
+            
+            Object.keys(dist).forEach(grade => {
+                const needed = dist[grade];
+                if (needed === 0) return;
+                
+                let gradeCards = availablePool.filter(c => c.grade === grade);
+                gradeCards = shuffleArray(gradeCards);
+                
+                const take = Math.min(needed, gradeCards.length);
+                for (let i = 0; i < take; i++) {
+                    const card = gradeCards[i];
+                    dealt.push({...card});
+                    // remove from available
+                    availablePool = availablePool.filter(c => c.id !== card.id);
+                }
+            });
+            
+            // If not enough cards in some grades, fill with random remaining
+            while (dealt.length < mode && availablePool.length > 0) {
+                const idx = Math.floor(Math.random() * availablePool.length);
+                dealt.push({...availablePool[idx]});
+                availablePool.splice(idx, 1);
+            }
+            
+            return shuffleArray(dealt);
+        }
+
+        // ==================== SCREEN MANAGEMENT ====================
+        function showScreen(screenId) {
+            // Hide all sections first
+            document.querySelectorAll('.section').forEach(s => {
+                s.classList.remove('active');
+                s.style.display = 'none';
+            });
+            
+            const target = document.getElementById(screenId);
+            if (target) {
+                target.classList.add('active');
+                target.style.display = 'block';
+            }
+            
+            // Special handling for main screen keyboard
+            if (screenId === 'main-screen') {
+                document.onkeydown = function handler(e) {
+                    const main = document.getElementById('main-screen');
+                    if (!main || !main.classList.contains('active')) {
+                        document.onkeydown = null;
+                        return;
+                    }
+                    startGame();
+                    document.onkeydown = null;
+                };
+            } else {
+                document.onkeydown = null;
+            }
+            
+            // Clear any floating deploy bar when changing screens
+            const deployBar = document.getElementById('deploy-bar');
+            if (deployBar) deployBar.remove();
+        }
+
+        function startGame() {
+            showScreen('choice-screen');
+        }
+
+        function selectGameMode(mode) {
+            gameState.mode = mode;
+            gameState.changeCount = 3;
+            gameState.playerDeck = dealCards(mode);
+            gameState.opponentDeck = dealCards(mode);
+            
+            // Reset other states
+            gameState.remainingPlayer = [...gameState.playerDeck];
+            gameState.remainingOpp = [...gameState.opponentDeck];
+            gameState.usedPlayer = [];
+            gameState.usedOpp = [];
+            gameState.battleLog = [];
+            gameState.currentBattle = 0;
+            gameState.wins = 0;
+            gameState.loses = 0;
+            gameState.selectedCardId = null;
+            gameState.isBattling = false;
+            
+            showDeckScreen();
+        }
+
+        function showDeckScreen() {
+            showScreen('deck-screen');
+            
+            const modeBadge = document.getElementById('mode-badge');
+            modeBadge.innerHTML = `${gameState.mode} VS ${gameState.mode} <span class="text-xs align-super text-red-400">MODE</span>`;
+            
+            document.getElementById('change-count').innerText = `${gameState.changeCount}/3`;
+            document.getElementById('change-btn').disabled = gameState.changeCount <= 0;
+            
+            renderDeckGrid();
+        }
+
+        function renderDeckGrid() {
+            const grid = document.getElementById('deck-grid');
+            grid.innerHTML = '';
+            
+            const totalEl = document.getElementById('deck-total');
+            totalEl.innerText = gameState.playerDeck.length;
+            
+            // Grade summary
+            const summary = document.getElementById('grade-summary');
+            summary.innerHTML = '';
+            
+            const gradeCount = {};
+            gameState.playerDeck.forEach(card => {
+                gradeCount[card.grade] = (gradeCount[card.grade] || 0) + 1;
+            });
+            
+            Object.keys(gradeCount).forEach(grade => {
+                const span = document.createElement('span');
+                span.className = `px-3 py-1 text-xs rounded-2xl border flex items-center gap-x-1 border-${getGradeColor(grade)}-500/60 bg-zinc-950`;
+                span.innerHTML = `<span class="font-mono">${gradeCount[grade]}</span> <span class="text-[10px] opacity-70">${grade}</span>`;
+                summary.appendChild(span);
+            });
+            
+            // Cards
+            gameState.playerDeck.forEach(card => {
+                const cardEl = createCardElement(card, true, true);
+                grid.appendChild(cardEl);
+            });
+        }
+
+        function createCardElement(card, showInfoBtn = true, clickable = true) {
+            const el = document.createElement('div');
+            el.className = `card bg-zinc-900 border-2 ${getGradeBorder(card.grade)} rounded-2xl overflow-hidden cursor-pointer flex flex-col`;
+            el.style.width = '100%';
+            el.style.maxWidth = '100%';
+            
+            const gradeColor = getGradeColor(card.grade);
+            
+            el.innerHTML = `
+                <div class="relative">
+                    <!-- Portrait -->
+                    <div class="card-portrait h-48 w-full" style="background-image: url('${card.img}')"></div>
+                    
+                    <!-- Grade badge -->
+                    <div class="absolute top-2 right-2 px-3 py-0.5 text-[10px] font-bold tracking-wider rounded bg-black/70 border border-white/20 text-white flex items-center gap-x-1">
+                        <span class="text-${gradeColor}-400">●</span> 
+                        <span>${card.grade}</span>
+                    </div>
+                    
+                    <!-- Power -->
+                    <div class="absolute bottom-2 right-2 bg-black/80 px-3 py-px rounded text-right">
+                        <div class="text-[9px] text-white/60 -mb-0.5">POWER</div>
+                        <div class="font-mono text-xl font-black leading-none text-white">${card.power}</div>
+                    </div>
+                </div>
+                
+                <div class="p-3 flex-1 flex flex-col">
+                    <div class="font-bold text-lg leading-tight mb-0.5">${card.name}</div>
+                    <div class="text-xs text-zinc-400 mb-2">${card.age}세 • ${card.region} • ${card.gender}</div>
+                    
+                    <div class="mt-auto flex items-center justify-between text-xs">
+                        <div>
+                            <span class="px-2 py-px bg-zinc-800 rounded text-[10px]">${card.class}</span>
+                        </div>
+                        <div class="text-emerald-400 font-mono text-xs">${card.attribute}</div>
+                    </div>
+                </div>
+            `;
+            
+            if (clickable) {
+                el.onclick = () => showCardModal(card);
+            }
+            
+            return el;
+        }
+
+        function changeDeck() {
+            if (gameState.changeCount <= 0) return;
+            
+            gameState.changeCount--;
+            gameState.playerDeck = dealCards(gameState.mode);
+            gameState.remainingPlayer = [...gameState.playerDeck];
+            
+            document.getElementById('change-count').innerText = `${gameState.changeCount}/3`;
+            document.getElementById('change-btn').disabled = gameState.changeCount <= 0;
+            
+            renderDeckGrid();
+            
+            // Toast
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-800 border border-amber-500 text-amber-300 px-6 py-2 rounded-2xl text-sm flex items-center gap-x-2 shadow-xl';
+            toast.innerHTML = `<i class="fa-solid fa-sync-alt"></i> <span>덱이 새롭게 섞였습니다. (남은 교체: ${gameState.changeCount})</span>`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.transition = 'all 0.3s ease';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 1600);
+        }
+
+        function confirmDeck() {
+            // Prepare for battle
+            gameState.remainingPlayer = [...gameState.playerDeck];
+            gameState.remainingOpp = shuffleArray([...gameState.opponentDeck]);
+            gameState.usedPlayer = [];
+            gameState.usedOpp = [];
+            gameState.battleLog = [];
+            gameState.currentBattle = 0;
+            gameState.wins = 0;
+            gameState.loses = 0;
+            gameState.selectedCardId = null;
+            
+            showBattleScreen();
+        }
+
+        // ==================== BATTLE SCREEN ====================
+        function showBattleScreen() {
+            showScreen('battle-screen');
+            updateBattleUI();
+            renderMyHand();
+            renderOppRemaining();
+            renderUsedCards();
+            
+            // Initial idle state
+            document.getElementById('vs-idle').classList.remove('hidden');
+            document.getElementById('vs-countdown').classList.add('hidden');
+            document.getElementById('vs-battle').classList.add('hidden');
+        }
+
+        function updateBattleUI() {
+            const total = gameState.mode;
+            const remaining = gameState.remainingPlayer.length;
+            const current = total - remaining + 1;
+            
+            document.getElementById('battle-progress').innerHTML = `${String(current).padStart(2, '0')} <span class="text-xl text-zinc-400">/ ${String(total).padStart(2, '0')}</span>`;
+            document.getElementById('remaining-count').innerText = remaining;
+            document.getElementById('total-battles').innerText = total;
+            document.getElementById('win-count').innerText = gameState.wins;
+            document.getElementById('lose-count').innerText = gameState.loses;
+            document.getElementById('hand-count').innerText = `${remaining} cards remaining`;
+        }
+
+        function renderMyHand() {
+            const container = document.getElementById('my-hand');
+            container.innerHTML = '';
+            
+            if (gameState.remainingPlayer.length === 0) {
+                // All battles done → show result
+                setTimeout(() => finishGame(), 600);
+                return;
+            }
+            
+            gameState.remainingPlayer.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.className = `card flex-shrink-0 w-[138px] bg-zinc-900 border-2 ${getGradeBorder(card.grade)} rounded-2xl overflow-hidden cursor-pointer snap-start`;
+                
+                const isSelected = gameState.selectedCardId === card.id;
+                if (isSelected) cardEl.classList.add('selected', 'ring-2', 'ring-offset-2', 'ring-offset-zinc-950', 'ring-yellow-400');
+                
+                cardEl.innerHTML = `
+                    <div class="relative h-[118px]">
+                        <div class="card-portrait h-full w-full" style="background-image: url('${card.img}')"></div>
+                        
+                        <div class="absolute top-1.5 right-1.5 px-2 py-px text-[9px] font-bold bg-black/75 rounded border border-white/20 flex items-center">
+                            <span class="text-${getGradeColor(card.grade)}-400 mr-0.5">●</span>
+                            <span class="text-white">${card.grade.split(' ')[0]}</span>
+                        </div>
+                        
+                        <div class="absolute bottom-1.5 right-1.5 bg-black/80 text-right px-2 py-0 rounded">
+                            <div class="font-mono text-lg font-black text-white leading-none">${card.power}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="px-2.5 py-2">
+                        <div class="font-bold text-sm leading-tight truncate">${card.name}</div>
+                        <div class="flex justify-between items-center mt-0.5">
+                            <span class="text-[10px] text-zinc-400">${card.age}세</span>
+                            <span class="font-mono text-emerald-400 text-xs">${card.attribute}</span>
+                        </div>
+                    </div>
+                `;
+                
+                cardEl.onclick = () => {
+                    gameState.selectedCardId = card.id;
+                    renderMyHand(); // re-render to show selection
+                    
+                    // Show deploy button if not already
+                    showDeployButton(card);
+                };
+                
+                // Long press or double click for info
+                cardEl.ondblclick = (e) => {
+                    e.stopImmediatePropagation();
+                    showCardModal(card);
+                };
+                
+                container.appendChild(cardEl);
+            });
+        }
+
+        function showDeployButton(selectedCard) {
+            // Remove existing deploy bar if any
+            const existing = document.getElementById('deploy-bar');
+            if (existing) existing.remove();
+            
+            const bar = document.createElement('div');
+            bar.id = 'deploy-bar';
+            bar.className = 'fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-yellow-500/30 p-4 z-40 flex justify-center';
+            
+            bar.innerHTML = `
+                <div class="max-w-md w-full flex items-center gap-x-4">
+                    <div class="flex-1">
+                        <div class="text-xs text-yellow-400">선택됨</div>
+                        <div class="font-bold">${selectedCard.name} <span class="font-mono text-yellow-400">P${selectedCard.power}</span></div>
+                    </div>
+                    
+                    <button onclick="deploySelectedCard()" 
+                            class="px-9 py-3.5 bg-yellow-400 hover:bg-yellow-300 active:bg-white transition text-black font-extrabold text-lg rounded-2xl flex items-center gap-x-2 shadow-xl">
+                        <span>DEPLOY</span>
+                        <i class="fa-solid fa-rocket"></i>
+                    </button>
+                    
+                    <button onclick="cancelSelection()" class="px-5 py-3.5 text-sm border border-white/30 hover:bg-zinc-800 rounded-2xl">취소</button>
+                </div>
+            `;
+            
+            document.body.appendChild(bar);
+        }
+
+        function cancelSelection() {
+            gameState.selectedCardId = null;
+            const bar = document.getElementById('deploy-bar');
+            if (bar) bar.remove();
+            renderMyHand();
+        }
+
+        function deploySelectedCard() {
+            if (!gameState.selectedCardId || gameState.isBattling) return;
+            
+            const myCard = gameState.remainingPlayer.find(c => c.id === gameState.selectedCardId);
+            if (!myCard) return;
+            
+            // Remove deploy bar
+            const bar = document.getElementById('deploy-bar');
+            if (bar) bar.remove();
+            
+            // Start battle sequence
+            startBattleSequence(myCard);
+        }
+
+        async function startBattleSequence(myCard) {
+            gameState.isBattling = true;
+            
+            // Remove selected card from remaining immediately (optimistic)
+            gameState.remainingPlayer = gameState.remainingPlayer.filter(c => c.id !== myCard.id);
+            renderMyHand(); // update hand early
+            
+            // Hide idle, show countdown
+            document.getElementById('vs-idle').classList.add('hidden');
+            document.getElementById('vs-countdown').classList.remove('hidden');
+            document.getElementById('vs-battle').classList.add('hidden');
+            
+            // Pick random opponent card
+            if (gameState.remainingOpp.length === 0) {
+                gameState.isBattling = false;
+                return;
+            }
+            
+            const oppIndex = Math.floor(Math.random() * gameState.remainingOpp.length);
+            const oppCard = gameState.remainingOpp[oppIndex];
+            gameState.remainingOpp.splice(oppIndex, 1);
+            
+            // Countdown 3 → 2 → 1
+            const countdownEl = document.getElementById('countdown-num');
+            for (let i = 3; i >= 1; i--) {
+                countdownEl.innerText = i;
+                countdownEl.style.animation = 'none';
+                countdownEl.offsetHeight; // trigger reflow
+                countdownEl.style.animation = 'impact-shake 0.4s ease';
+                await new Promise(r => setTimeout(r, 650));
+            }
+            
+            // Show VS battle view
+            document.getElementById('vs-countdown').classList.add('hidden');
+            document.getElementById('vs-battle').classList.remove('hidden');
+            
+            // Populate VS cards
+            renderVsCard('vs-my-card', myCard, true);
+            renderVsCard('vs-opp-card', oppCard, false);
+            
+            // Impact animation
+            const vsZone = document.getElementById('vs-zone');
+            vsZone.classList.add('vs-impact');
+            setTimeout(() => vsZone.classList.remove('vs-impact'), 700);
+            
+            // Determine winner
+            const myWins = myCard.power > oppCard.power;
+            const resultText = document.getElementById('result-text');
+            const stampContainer = document.getElementById('battle-result-stamp');
+            
+            stampContainer.classList.remove('hidden');
+            
+            if (myWins) {
+                resultText.innerHTML = `<span class="text-emerald-400">WIN</span>`;
+                resultText.className = `inline-block px-10 py-1 text-5xl font-black tracking-[4px] text-emerald-400`;
+                gameState.wins++;
+                
+                // Gold glow on my card
+                const myCardEl = document.getElementById('vs-my-card');
+                myCardEl.classList.add('gold-glow', 'border-emerald-400');
+                
+                // Crack on opp
+                const oppCardEl = document.getElementById('vs-opp-card');
+                oppCardEl.classList.add('cracked', 'border-red-600');
+            } else {
+                resultText.innerHTML = `<span class="text-red-500">LOSE</span>`;
+                resultText.className = `inline-block px-10 py-1 text-5xl font-black tracking-[4px] text-red-500`;
+                gameState.loses++;
+                
+                const myCardEl = document.getElementById('vs-my-card');
+                myCardEl.classList.add('cracked', 'border-red-600');
+                
+                const oppCardEl = document.getElementById('vs-opp-card');
+                oppCardEl.classList.add('gold-glow', 'border-emerald-400');
+            }
+            
+            // Update used
+            gameState.usedPlayer.unshift({ ...myCard, win: myWins });
+            gameState.usedOpp.unshift({ ...oppCard, win: !myWins });
+            
+            // Log
+            gameState.battleLog.push({
+                battleNum: gameState.currentBattle + 1,
+                myCard: { ...myCard },
+                oppCard: { ...oppCard },
+                win: myWins,
+                myPower: myCard.power,
+                oppPower: oppCard.power
+            });
+            
+            gameState.currentBattle++;
+            
+            // Update UI numbers
+            updateBattleUI();
+            renderUsedCards();
+            renderOppRemaining();
+            
+            // Wait 2.2s then prepare next
+            await new Promise(r => setTimeout(r, 2250));
+            
+            // Reset VS area for next
+            stampContainer.classList.add('hidden');
+            document.getElementById('vs-my-card').innerHTML = '';
+            document.getElementById('vs-opp-card').innerHTML = '';
+            document.getElementById('vs-my-card').className = 'battle-card mx-auto w-[190px] bg-zinc-800 border-2 border-emerald-500 rounded-2xl overflow-hidden shadow-xl';
+            document.getElementById('vs-opp-card').className = 'battle-card mx-auto w-[190px] bg-zinc-800 border-2 border-red-500 rounded-2xl overflow-hidden shadow-xl';
+            
+            gameState.isBattling = false;
+            gameState.selectedCardId = null;
+            
+            // Show idle again or continue
+            if (gameState.remainingPlayer.length > 0) {
+                document.getElementById('vs-idle').classList.remove('hidden');
+                document.getElementById('vs-battle').classList.add('hidden');
+                renderMyHand();
+            } else {
+                // Finish
+                finishGame();
+            }
+        }
+
+        function renderVsCard(containerId, card, isPlayer) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `
+                <div class="relative">
+                    <div class="card-portrait h-[178px] w-full" style="background-image: url('${card.img}')"></div>
+                    
+                    <div class="absolute top-2 right-2 px-3 py-0.5 text-xs font-bold bg-black/80 rounded border border-white/30">
+                        ${card.grade}
+                    </div>
+                    
+                    <div class="p-3 bg-zinc-900/95">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <div class="font-extrabold text-xl leading-none">${card.name}</div>
+                                <div class="text-xs text-white/60">${card.age}세 • ${card.region}</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[10px] text-white/50">POWER</div>
+                                <div class="font-mono text-4xl font-black text-white tabular-nums">${card.power}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderOppRemaining() {
+            const container = document.getElementById('opp-remaining');
+            container.innerHTML = '';
+            
+            gameState.remainingOpp.forEach((card, idx) => {
+                const el = document.createElement('div');
+                el.className = `flex-shrink-0 w-11 h-16 bg-zinc-800 border border-red-900/60 rounded-xl overflow-hidden flex items-center justify-center relative`;
+                
+                el.innerHTML = `
+                    <div class="text-center">
+                        <i class="fa-solid fa-question text-red-600/70 text-3xl"></i>
+                    </div>
+                    <div class="absolute bottom-0 inset-x-0 h-4 bg-gradient-to-t from-black/60 to-transparent"></div>
+                `;
+                
+                // Hover to peek very slightly (demo only)
+                el.onmouseenter = () => {
+                    if (!gameState.isBattling) el.style.transform = 'translateY(-2px)';
+                };
+                el.onmouseleave = () => el.style.transform = '';
+                
+                container.appendChild(el);
+            });
+            
+            // If empty show message
+            if (gameState.remainingOpp.length === 0) {
+                container.innerHTML = `<div class="text-xs text-zinc-500 px-4 self-center">모든 카드 소진</div>`;
+            }
+        }
+
+        function renderUsedCards() {
+            // Player used (bottom right area conceptually, but we put below hand in this layout)
+            // For now we render small used in a dedicated area. In this version we show in battle header area.
+            
+            const oppUsedContainer = document.getElementById('opp-used');
+            oppUsedContainer.innerHTML = '';
+            
+            // Show last 4 used opp
+            const recentOpp = gameState.usedOpp.slice(0, 4);
+            recentOpp.forEach(used => {
+                const el = document.createElement('div');
+                el.className = `used-card w-9 h-12 flex-shrink-0 rounded-lg overflow-hidden border ${used.win ? 'win border-emerald-400' : 'lose border-red-600'}`;
+                el.style.backgroundImage = `url('${used.img}')`;
+                el.style.backgroundSize = 'cover';
+                el.style.backgroundPosition = 'center';
+                el.title = `${used.name} (${used.power})`;
+                
+                el.onclick = () => showCardModal(used);
+                oppUsedContainer.appendChild(el);
+            });
+            
+            // My used cards are visible in the hand area indirectly. For better UX we can add a small tray but skip for space.
+        }
+
+        function finishGame() {
+            showScreen('result-screen');
+            
+            const isWin = gameState.wins > gameState.loses;
+            const finalText = document.getElementById('final-result-text');
+            
+            if (isWin) {
+                finalText.innerHTML = `YOUR <span class="text-emerald-400">VICTORY</span>`;
+                finalText.className = `text-7xl font-black title-font tracking-tighter mb-1 text-emerald-400`;
+            } else {
+                finalText.innerHTML = `CITY <span class="text-red-500">DEFEAT</span>`;
+                finalText.className = `text-7xl font-black title-font tracking-tighter mb-1 text-red-500`;
+            }
+            
+            document.getElementById('final-score').innerHTML = `${gameState.wins} <span class="text-zinc-400">WINS</span> — ${gameState.loses} <span class="text-zinc-400">LOSES</span>`;
+            
+            renderBattleLog();
+        }
+
+        function renderBattleLog() {
+            const container = document.getElementById('battle-log');
+            container.innerHTML = '';
+            
+            gameState.battleLog.forEach((log, index) => {
+                const el = document.createElement('div');
+                el.className = `bg-zinc-950 border border-zinc-700 rounded-2xl p-3 flex gap-x-3 cursor-pointer hover:border-zinc-400 transition`;
+                
+                const myWinClass = log.win ? 'border-emerald-500' : 'border-red-600';
+                const oppWinClass = log.win ? 'border-red-600' : 'border-emerald-500';
+                
+                el.innerHTML = `
+                    <div class="flex-1">
+                        <div class="text-xs text-zinc-400 mb-1">BATTLE ${log.battleNum}</div>
+                        
+                        <div class="flex gap-x-2 items-center">
+                            <!-- My card mini -->
+                            <div class="w-14 h-14 rounded-xl overflow-hidden border-2 ${myWinClass} flex-shrink-0" style="background-image: url('${log.myCard.img}'); background-size:cover; background-position:center"></div>
+                            
+                            <div class="flex-1 min-w-0">
+                                <div class="font-bold text-sm truncate">${log.myCard.name}</div>
+                                <div class="font-mono text-xs text-emerald-400">P${log.myPower}</div>
+                            </div>
+                            
+                            <div class="px-2 text-center">
+                                <div class="text-[10px] ${log.win ? 'text-emerald-400' : 'text-red-400'} font-black">${log.win ? 'WIN' : 'LOSE'}</div>
+                            </div>
+                            
+                            <!-- Opp card mini -->
+                            <div class="w-14 h-14 rounded-xl overflow-hidden border-2 ${oppWinClass} flex-shrink-0" style="background-image: url('${log.oppCard.img}'); background-size:cover; background-position:center"></div>
+                            
+                            <div class="flex-1 min-w-0 text-right">
+                                <div class="font-bold text-sm truncate">${log.oppCard.name}</div>
+                                <div class="font-mono text-xs text-red-400">P${log.oppPower}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                el.onclick = () => {
+                    // Show detail modal for this battle
+                    showBattleDetailModal(log);
+                };
+                
+                container.appendChild(el);
+            });
+        }
+
+        function showBattleDetailModal(log) {
+            const modal = document.getElementById('card-modal');
+            const content = document.getElementById('modal-content');
+            
+            const resultHTML = log.win 
+                ? `<div class="text-emerald-400 text-4xl font-black tracking-wider">WIN</div>` 
+                : `<div class="text-red-500 text-4xl font-black tracking-wider">LOSE</div>`;
+            
+            content.innerHTML = `
+                <div class="p-6">
+                    <div class="flex justify-between mb-4">
+                        <div>
+                            <span class="text-xs px-3 py-1 bg-zinc-800 rounded">BATTLE ${log.battleNum}</span>
+                        </div>
+                        <div onclick="hideCardModal()" class="cursor-pointer text-zinc-400 hover:text-white"><i class="fa-solid fa-times text-2xl"></i></div>
+                    </div>
+                    
+                    <div class="flex gap-x-6 items-center justify-center mb-8">
+                        <!-- My Card -->
+                        <div class="text-center w-44">
+                            <div class="text-emerald-400 text-xs mb-1 font-bold">YOUR CARD</div>
+                            <div class="battle-card w-full border-2 border-emerald-500 rounded-2xl overflow-hidden">
+                                <div class="card-portrait h-44 w-full" style="background-image: url('${log.myCard.img}')"></div>
+                                <div class="p-3 bg-zinc-900">
+                                    <div class="font-extrabold">${log.myCard.name}</div>
+                                    <div class="flex justify-between text-xs mt-px">
+                                        <span class="text-white/60">${log.myCard.grade}</span>
+                                        <span class="font-mono text-emerald-400">P${log.myPower}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-6">
+                            ${resultHTML}
+                            <div class="text-center text-xs mt-1 text-white/40">VS</div>
+                        </div>
+                        
+                        <!-- Opp Card -->
+                        <div class="text-center w-44">
+                            <div class="text-red-400 text-xs mb-1 font-bold">OPPONENT</div>
+                            <div class="battle-card w-full border-2 border-red-500 rounded-2xl overflow-hidden">
+                                <div class="card-portrait h-44 w-full" style="background-image: url('${log.oppCard.img}')"></div>
+                                <div class="p-3 bg-zinc-900">
+                                    <div class="font-extrabold">${log.oppCard.name}</div>
+                                    <div class="flex justify-between text-xs mt-px">
+                                        <span class="text-white/60">${log.oppCard.grade}</span>
+                                        <span class="font-mono text-red-400">P${log.oppPower}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center text-sm text-zinc-400">
+                        ${log.myCard.power} vs ${log.oppCard.power} — 
+                        <span class="${log.win ? 'text-emerald-400' : 'text-red-400'} font-bold">${log.win ? 'YOUR POWER WINS' : 'OPPONENT POWER WINS'}</span>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        // ==================== CARD MODAL ====================
+        function showCardModal(card) {
+            const modal = document.getElementById('card-modal');
+            const content = document.getElementById('modal-content');
+            
+            const gradeColor = getGradeColor(card.grade);
+            
+            content.innerHTML = `
+                <div>
+                    <!-- Image header -->
+                    <div class="relative h-72">
+                        <div class="card-portrait w-full h-full" style="background-image: url('${card.img}')"></div>
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-zinc-900/95"></div>
+                        
+                        <div class="absolute top-4 right-4">
+                            <div class="px-4 py-1 text-sm font-bold rounded-2xl border border-white/30 bg-black/60 flex items-center gap-x-2">
+                                <span class="text-${gradeColor}-400">●</span>
+                                <span>${card.grade}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <div class="flex justify-between items-end">
+                                <div>
+                                    <div class="text-4xl font-black tracking-tight">${card.name}</div>
+                                    <div class="text-white/70">${card.age}세 • ${card.gender} • ${card.region}</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs text-white/50">POWER</div>
+                                    <div class="font-mono text-6xl font-black tabular-nums">${card.power}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 pt-5">
+                        <div class="grid grid-cols-3 gap-4 text-sm mb-6">
+                            <div>
+                                <div class="text-xs text-zinc-400">CLASS</div>
+                                <div class="font-bold text-lg">${card.class}</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-zinc-400">ATTRIBUTE</div>
+                                <div class="font-bold text-lg text-emerald-400">${card.attribute}</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-zinc-400">ID</div>
+                                <div class="font-mono text-xs tracking-tighter">${card.id}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <div class="text-xs text-zinc-400 mb-1">PROFILE / 백스토리</div>
+                            <p class="text-sm leading-relaxed text-white/80">${card.desc || '이 카드에 대한 상세한 이야기는 아직 밝혀지지 않았습니다. POWER가 모든 것을 말해줍니다.'}</p>
+                        </div>
+                        
+                        <div class="flex gap-x-3">
+                            <button onclick="hideCardModal()" class="flex-1 py-3 border border-white/30 hover:bg-white/5 rounded-2xl text-sm font-medium">닫기</button>
+                            
+                            ${gameState.remainingPlayer.some(c => c.id === card.id) ? `
+                            <button onclick="selectCardFromModal(${card.id}); hideCardModal();" 
+                                    class="flex-1 py-3 bg-yellow-400 text-black font-bold rounded-2xl text-sm active:bg-yellow-300 transition">이 카드 선택</button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        
+        function selectCardFromModal(cardId) {
+            hideCardModal();
+            
+            // Only works if we are in battle screen and card is still in hand
+            if (!document.getElementById('battle-screen').classList.contains('active')) {
+                return;
+            }
+            
+            const card = gameState.remainingPlayer.find(c => c.id === cardId);
+            if (!card) return;
+            
+            gameState.selectedCardId = cardId;
+            renderMyHand();
+            showDeployButton(card);
+        }
+
+        function hideCardModal() {
+            const modal = document.getElementById('card-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        // ==================== RESTART ====================
+        function restartGame() {
+            // Reset everything
+            gameState = {
+                mode: 5,
+                playerDeck: [],
+                opponentDeck: [],
+                remainingPlayer: [],
+                remainingOpp: [],
+                usedPlayer: [],
+                usedOpp: [],
+                battleLog: [],
+                changeCount: 3,
+                currentBattle: 0,
+                wins: 0,
+                loses: 0,
+                selectedCardId: null,
+                isBattling: false
+            };
+            
+            // Clean any floating bars
+            const bar = document.getElementById('deploy-bar');
+            if (bar) bar.remove();
+            
+            showScreen('main-screen');
+        }
+
+        // ==================== INIT ====================
+        function initGame() {
+            initTailwind();
+            
+            // Show main screen
+            showScreen('main-screen');
+            
+            // Easter egg: click logo to show data source
+            const logo = document.querySelector('.title-font');
+            if (logo) {
+                logo.onclick = () => {
+                    const msg = document.createElement('div');
+                    msg.className = 'fixed top-20 left-1/2 -translate-x-1/2 text-xs bg-black/90 border border-zinc-600 px-5 py-2 rounded-2xl flex items-center gap-x-2 text-emerald-300';
+                    msg.innerHTML = `<i class="fa-brands fa-github"></i> <span>Data based on VRB_DATA • github.com/steveJea/vr-ideal-worldcup</span>`;
+                    document.body.appendChild(msg);
+                    setTimeout(() => {
+                        msg.style.transition = 'opacity .3s';
+                        msg.style.opacity = '0';
+                        setTimeout(() => msg.remove(), 300);
+                    }, 2400);
+                };
+            }
+            
+            // Keyboard hint on main
+            console.log('%c[VR Battle Masters] Game initialized. Press any key on title screen to start.', 'color:#444');
+            
+            // Optional: preload some images (not critical)
+            // In real deployment you would host the actual card arts from your collection.
+        }
+
+        // Boot
+        window.onload = initGame;
+        
+        // Expose for debugging if needed
+        window.VRBM = { gameState, cardPool, dealCards };
+    </script>
+</body>
+</html>
