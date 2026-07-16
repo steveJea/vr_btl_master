@@ -25,8 +25,6 @@
         .deck-grid { scrollbar-width: thin; scrollbar-color: #475569 #1e2937; }
         .modal { animation: modal-pop .2s ease-out forwards; }
         @keyframes modal-pop { from {opacity:0; transform:scale(.96) translateY(8px)} to {opacity:1; transform:scale(1) translateY(0)} }
-        .tournament-card { transition: all 0.2s ease; }
-        .tournament-card:hover { transform: translateY(-3px); }
     </style>
 </head>
 <body class="bg-zinc-950 text-white game-bg min-h-screen">
@@ -195,9 +193,15 @@
                 const obj = {};
                 headers.forEach((h, i) => obj[h.trim()] = vals[i] ? vals[i].trim() : '');
                 return {
-                    id: obj.id, name: obj.name, gender: obj.gender, age: parseInt(obj.age)||0,
-                    region: obj.region, grade: obj.grade, class: obj.class, attribute: obj.attribute,
-                    power: parseInt(obj.power)||0
+                    id: obj.id,
+                    name: obj.name,
+                    gender: obj.gender,
+                    age: parseInt(obj.age) || 0,
+                    region: obj.region,
+                    grade: obj.grade,
+                    class: obj.class,
+                    attribute: obj.attribute,
+                    power: parseInt(obj.power) || 0
                 };
             });
         }
@@ -213,40 +217,73 @@
             }
         }
 
-        let gameState = { mode:5, playerDeck:[], opponentDeck:[], remainingPlayer:[], remainingOpp:[], usedPlayer:[], usedOpp:[], battleLog:[], changeCount:3, currentBattle:0, wins:0, loses:0, selectedCardId:null, isBattling:false };
+        let gameState = {
+            mode: 5,
+            playerDeck: [],
+            opponentDeck: [],
+            remainingPlayer: [],
+            remainingOpp: [],
+            usedPlayer: [],
+            usedOpp: [],
+            battleLog: [],
+            changeCount: 3,
+            currentBattle: 0,
+            wins: 0,
+            loses: 0,
+            selectedCardId: null,
+            isBattling: false
+        };
 
-        function getGradeColor(g){ return {"NORMAL":"slate","RARE":"blue","HIGH RARE":"violet","SUPER RARE":"pink","ULTRA RARE":"amber","MYTHIC RARE":"red"}[g]||"slate"; }
-        function getGradeBorder(g){ return `border-${getGradeColor(g)}-500`; }
-        function shuffleArray(a){ return [...a].sort(()=>Math.random()-0.5); }
+        function getGradeColor(g) {
+            return {"NORMAL":"slate","RARE":"blue","HIGH RARE":"violet","SUPER RARE":"pink","ULTRA RARE":"amber","MYTHIC RARE":"red"}[g] || "slate";
+        }
+        function getGradeBorder(g) { return `border-${getGradeColor(g)}-500`; }
+        function shuffleArray(a) { return [...a].sort(() => Math.random() - 0.5); }
 
-        function dealCards(mode){
+        function dealCards(mode) {
             const dist = {5:{"NORMAL":2,"RARE":1,"HIGH RARE":1,"SUPER RARE":0,"ULTRA RARE":1,"MYTHIC RARE":0},10:{"NORMAL":5,"RARE":2,"HIGH RARE":1,"SUPER RARE":1,"ULTRA RARE":1,"MYTHIC RARE":0},20:{"NORMAL":10,"RARE":4,"HIGH RARE":2,"SUPER RARE":2,"ULTRA RARE":1,"MYTHIC RARE":1}}[mode];
-            let dealt=[], avail=[...cardPool];
+            let dealt = [], avail = [...cardPool];
             Object.keys(dist).forEach(gr => {
-                let need = dist[gr]; if(!need) return;
-                let gc = shuffleArray(avail.filter(c=>c.grade===gr));
-                for(let i=0; i<Math.min(need, gc.length); i++){ dealt.push({...gc[i]}); avail = avail.filter(c=>c.id!==gc[i].id); }
+                let need = dist[gr]; if (!need) return;
+                let gc = shuffleArray(avail.filter(c => c.grade === gr));
+                for (let i = 0; i < Math.min(need, gc.length); i++) {
+                    dealt.push({...gc[i]});
+                    avail = avail.filter(c => c.id !== gc[i].id);
+                }
             });
-            while(dealt.length < mode && avail.length){ let r = Math.floor(Math.random()*avail.length); dealt.push({...avail[r]}); avail.splice(r,1); }
+            while (dealt.length < mode && avail.length) {
+                let r = Math.floor(Math.random() * avail.length);
+                dealt.push({...avail[r]});
+                avail.splice(r, 1);
+            }
             return shuffleArray(dealt);
         }
 
-        function showScreen(id){
-            document.querySelectorAll('.section').forEach(s => { s.classList.remove('active'); s.style.display='none'; });
-            const t = document.getElementById(id); if(t){ t.classList.add('active'); t.style.display='block'; }
+        function showScreen(id) {
+            document.querySelectorAll('.section').forEach(s => { s.classList.remove('active'); s.style.display = 'none'; });
+            const t = document.getElementById(id);
+            if (t) { t.classList.add('active'); t.style.display = 'block'; }
         }
 
-        function startGame(){ showScreen('choice-screen'); }
+        function startGame() { showScreen('choice-screen'); }
 
-        function selectGameMode(m){
-            gameState.mode = m; gameState.changeCount = 3;
-            gameState.playerDeck = dealCards(m); gameState.opponentDeck = dealCards(m);
-            gameState.remainingPlayer = [...gameState.playerDeck]; gameState.remainingOpp = [...gameState.opponentDeck];
-            gameState.usedPlayer=[]; gameState.usedOpp=[]; gameState.battleLog=[]; gameState.currentBattle=0; gameState.wins=0; gameState.loses=0;
+        function selectGameMode(m) {
+            gameState.mode = m;
+            gameState.changeCount = 3;
+            gameState.playerDeck = dealCards(m);
+            gameState.opponentDeck = dealCards(m);
+            gameState.remainingPlayer = [...gameState.playerDeck];
+            gameState.remainingOpp = [...gameState.opponentDeck];
+            gameState.usedPlayer = [];
+            gameState.usedOpp = [];
+            gameState.battleLog = [];
+            gameState.currentBattle = 0;
+            gameState.wins = 0;
+            gameState.loses = 0;
             showDeckScreen();
         }
 
-        function showDeckScreen(){
+        function showDeckScreen() {
             showScreen('deck-screen');
             document.getElementById('mode-badge').innerHTML = `${gameState.mode} VS ${gameState.mode}`;
             document.getElementById('change-count').innerText = `${gameState.changeCount}/3`;
@@ -254,23 +291,24 @@
             renderDeckGrid();
         }
 
-        function renderDeckGrid(){
-            const grid = document.getElementById('deck-grid'); grid.innerHTML = '';
+        function renderDeckGrid() {
+            const grid = document.getElementById('deck-grid');
+            grid.innerHTML = '';
             gameState.playerDeck.forEach(card => {
                 const el = createCardElement(card, true, true);
                 grid.appendChild(el);
             });
         }
 
-        function createCardElement(card, clickable = true){
+        function createCardElement(card, clickable = true) {
             const el = document.createElement('div');
             el.className = `card bg-zinc-900 border-2 ${getGradeBorder(card.grade)} rounded-2xl overflow-hidden cursor-pointer`;
             const imgSrc = `${IMAGE_BASE}${card.id}.jpg`;
-            const placeholder = `https://picsum.photos/id/${(parseInt(card.id)%200)+29}/300/380`;
-            
+            const placeholder = `https://picsum.photos/id/${(parseInt(card.id) % 200) + 29}/300/380`;
+
             el.innerHTML = `
                 <div class="relative">
-                    <img src="${imgSrc}" class="w-full h-48 object-cover" onerror="this.src='${placeholder}';this.onerror=null;">
+                    <img src="${imgSrc}" class="w-full h-48 object-cover" onerror="this.src='${placeholder}'; this.onerror=null;">
                     <div class="absolute top-2 right-2 px-3 py-0.5 text-[10px] font-bold bg-black/70 border border-white/20 rounded flex items-center gap-x-1">
                         <span class="text-${getGradeColor(card.grade)}-400">●</span> <span>${card.grade}</span>
                     </div>
@@ -284,38 +322,38 @@
                     <div class="text-xs text-zinc-400">${card.age}세 • ${card.region}</div>
                 </div>
             `;
-            if(clickable) el.onclick = () => showCardModal(card);
+            if (clickable) el.onclick = () => showCardModal(card);
             return el;
         }
 
-        function changeDeck(){
-            if(gameState.changeCount <= 0) return;
+        function changeDeck() {
+            if (gameState.changeCount <= 0) return;
             gameState.changeCount--;
             gameState.playerDeck = dealCards(gameState.mode);
             document.getElementById('change-count').innerText = `${gameState.changeCount}/3`;
             renderDeckGrid();
         }
 
-        function confirmDeck(){
+        function confirmDeck() {
             gameState.remainingPlayer = [...gameState.playerDeck];
             gameState.remainingOpp = shuffleArray([...gameState.opponentDeck]);
             showBattleScreen();
         }
 
-        function showBattleScreen(){
+        function showBattleScreen() {
             showScreen('battle-screen');
             updateBattleUI();
             renderMyHand();
         }
 
-        function updateBattleUI(){
+        function updateBattleUI() {
             const rem = gameState.remainingPlayer.length;
-            document.getElementById('battle-progress').innerHTML = `${String(gameState.mode-rem+1).padStart(2,'0')} / ${gameState.mode}`;
+            document.getElementById('battle-progress').innerHTML = `${String(gameState.mode - rem + 1).padStart(2,'0')} / ${gameState.mode}`;
             document.getElementById('win-count').innerText = gameState.wins;
             document.getElementById('lose-count').innerText = gameState.loses;
         }
 
-        function renderMyHand(){
+        function renderMyHand() {
             const c = document.getElementById('my-hand'); c.innerHTML = '';
             gameState.remainingPlayer.forEach(card => {
                 const el = document.createElement('div');
@@ -333,8 +371,8 @@
             });
         }
 
-        function showDeployButton(card){
-            const old = document.getElementById('deploy-bar'); if(old) old.remove();
+        function showDeployButton(card) {
+            const old = document.getElementById('deploy-bar'); if (old) old.remove();
             const bar = document.createElement('div');
             bar.id = 'deploy-bar';
             bar.className = 'fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-yellow-500/40 p-4 z-40 flex justify-center';
@@ -342,45 +380,41 @@
             document.body.appendChild(bar);
         }
 
-        async function deploySelectedCard(){
-            // 간단한 배틀 로직 (원본 스타일 유지하면서 최소 구현)
-            if(!gameState.selectedCardId || gameState.isBattling) return;
+        function deploySelectedCard() {
+            if (!gameState.selectedCardId || gameState.isBattling) return;
             const myCard = gameState.remainingPlayer.find(c => c.id === gameState.selectedCardId);
-            if(!myCard) return;
+            if (!myCard) return;
             document.getElementById('deploy-bar')?.remove();
             gameState.remainingPlayer = gameState.remainingPlayer.filter(c => c.id !== myCard.id);
             renderMyHand();
 
-            if(gameState.remainingOpp.length === 0) return;
-            const oppCard = gameState.remainingOpp.splice(Math.floor(Math.random()*gameState.remainingOpp.length), 1)[0];
-
+            if (gameState.remainingOpp.length === 0) return;
+            const oppCard = gameState.remainingOpp.splice(Math.floor(Math.random() * gameState.remainingOpp.length), 1)[0];
             const myWin = myCard.power > oppCard.power;
-            if(myWin) gameState.wins++; else gameState.loses++;
-
+            if (myWin) gameState.wins++; else gameState.loses++;
             alert(`${myCard.name} (${myCard.power}) vs ${oppCard.name} (${oppCard.power})\n\n${myWin ? 'WIN!' : 'LOSE'}`);
-
             updateBattleUI();
-            if(gameState.remainingPlayer.length === 0) finishGame();
+            if (gameState.remainingPlayer.length === 0) finishGame();
         }
 
-        function finishGame(){
+        function finishGame() {
             showScreen('result-screen');
             const isWin = gameState.wins > gameState.loses;
             document.getElementById('final-result-text').innerHTML = isWin ? `YOUR <span class="text-emerald-400">VICTORY</span>` : `CITY <span class="text-red-500">DEFEAT</span>`;
             document.getElementById('final-score').innerHTML = `${gameState.wins} WINS — ${gameState.loses} LOSES`;
         }
 
-        function showCardModal(card){
+        function showCardModal(card) {
             const modal = document.getElementById('card-modal');
             const content = document.getElementById('modal-content');
             content.innerHTML = `<div class="p-6"><div class="text-3xl font-bold mb-2">${card.name}</div><div class="text-6xl font-black mb-4">${card.power}</div><div>${card.grade} • ${card.region}</div><button onclick="hideCardModal()" class="mt-6 w-full py-3 bg-zinc-800 rounded-2xl">닫기</button></div>`;
             modal.classList.remove('hidden'); modal.classList.add('flex');
         }
-        function hideCardModal(){ document.getElementById('card-modal').classList.add('hidden'); document.getElementById('card-modal').classList.remove('flex'); }
+        function hideCardModal() { document.getElementById('card-modal').classList.add('hidden'); document.getElementById('card-modal').classList.remove('flex'); }
 
-        function restartGame(){ location.reload(); }
+        function restartGame() { location.reload(); }
 
-        async function initGame(){
+        async function initGame() {
             await loadRealData();
             showScreen('main-screen');
         }
