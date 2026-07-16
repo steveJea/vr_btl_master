@@ -674,10 +674,20 @@ async function loadRealData() {
         }
 
         // ==================== SCREEN MANAGEMENT ====================
-        function showScreen(screenId) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            const target = document.getElementById(screenId);
-            if (target) target.classList.add('active');
+function showScreen(screenId) {
+    // 모든 section을 강제로 숨김
+    document.querySelectorAll('.section').forEach(s => {
+        s.classList.remove('active');
+        s.style.display = 'none';           // ← 핵심
+    });
+
+    // 원하는 화면을 표시
+    const target = document.getElementById(screenId);
+    if (target) {
+        target.classList.add('active');
+        target.style.display = 'block';     // ← 핵심
+    }
+}
             
             // Special handling
             if (screenId === 'main-screen') {
