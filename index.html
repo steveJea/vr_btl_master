@@ -34,12 +34,13 @@
             background: linear-gradient(180deg, #0a0a0a 0%, #1a0f0f 50%, #0a0a0a 100%);
         }
         
-        .section {
-            display: none;
-        }
-        
-        .section.active {
-            display: block;
+.section {
+    display: none !important;     /* ← !important 추가 */
+}
+
+.section.active {
+    display: block !important;    /* ← !important 추가 */
+}
         }
         
         .card {
@@ -675,35 +676,32 @@ async function loadRealData() {
 
         // ==================== SCREEN MANAGEMENT ====================
 function showScreen(screenId) {
-    // 모든 section을 강제로 숨김
+    // 모든 section 강제 숨김
     document.querySelectorAll('.section').forEach(s => {
         s.classList.remove('active');
-        s.style.display = 'none';           // ← 핵심
+        s.style.setProperty('display', 'none', 'important');   // 더 강력하게
     });
 
-    // 원하는 화면을 표시
     const target = document.getElementById(screenId);
     if (target) {
         target.classList.add('active');
-        target.style.display = 'block';     // ← 핵심
+        target.style.setProperty('display', 'block', 'important');
+    }
+
+    // Special handling (main-screen 키보드 이벤트)
+    if (screenId === 'main-screen') {
+        document.onkeydown = function(e) {
+            if (!document.getElementById('main-screen').classList.contains('active')) {
+                document.onkeydown = null;
+                return;
+            }
+            startGame();
+            document.onkeydown = null;
+        };
+    } else {
+        document.onkeydown = null;
     }
 }
-            
-            // Special handling
-            if (screenId === 'main-screen') {
-                // allow any key start
-                document.onkeydown = function(e) {
-                    if (!document.getElementById('main-screen').classList.contains('active')) {
-                        document.onkeydown = null;
-                        return;
-                    }
-                    startGame();
-                    document.onkeydown = null;
-                };
-            } else {
-                document.onkeydown = null;
-            }
-        }
 
         function startGame() {
             showScreen('choice-screen');
