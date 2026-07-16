@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VR BATTLE MASTERS • Real Data</title>
+    <title>VR BATTLE MASTERS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -11,54 +11,60 @@
         .title-font { font-family: 'Anton', Impact, system-ui, sans-serif; }
         .section { display: none !important; }
         .section.active { display: block !important; }
+        .tournament-card { transition: all 0.2s ease; }
+        .tournament-card:hover { transform: translateY(-3px); }
     </style>
 </head>
 <body class="bg-zinc-950 text-white">
     <div class="max-w-7xl mx-auto p-6">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="title-font text-4xl">VR BATTLE MASTERS <span class="text-red-500 text-xl">(Real Data)</span></h1>
-            <button onclick="restartGame()" class="px-4 py-2 bg-zinc-800 rounded">처음으로</button>
+        <!-- 헤더 -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <span class="title-font text-4xl">VR BATTLE MASTERS</span>
+                <span class="ml-3 text-red-500 text-sm">Real Data</span>
+            </div>
+            <button onclick="restartGame()" class="px-4 py-2 bg-zinc-800 rounded text-sm">처음으로</button>
         </div>
 
-        <!-- MAIN -->
-        <div id="main-screen" class="section active text-center py-20">
-            <h2 class="text-6xl font-bold mb-4">VIOLENCE ROYALE</h2>
-            <p class="text-xl text-zinc-400 mb-8">실제 VR_DATA.csv 기반 카드 배틀</p>
-            <button onclick="startGame()" class="px-10 py-4 bg-red-600 text-xl font-bold rounded-2xl">게임 시작</button>
+        <!-- 메인 화면 -->
+        <div id="main-screen" class="section active text-center py-16">
+            <h1 class="text-7xl font-black mb-4">VIOLENCE ROYALE</h1>
+            <p class="text-xl text-zinc-400 mb-10">실제 VR_DATA.csv 기반 카드 배틀</p>
+            <button onclick="startGame()" class="px-14 py-4 bg-red-600 text-xl font-bold rounded-2xl">게임 시작</button>
         </div>
 
-        <!-- CHOICE -->
+        <!-- 모드 선택 -->
         <div id="choice-screen" class="section text-center py-10">
-            <h2 class="text-4xl mb-8">게임 모드 선택</h2>
-            <div class="flex justify-center gap-6">
-                <button onclick="selectGameMode(5)" class="px-8 py-6 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl text-2xl">5 VS 5</button>
-                <button onclick="selectGameMode(10)" class="px-8 py-6 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl text-2xl">10 VS 10</button>
-                <button onclick="selectGameMode(20)" class="px-8 py-6 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl text-2xl">20 VS 20</button>
+            <h2 class="text-3xl mb-8">게임 모드 선택</h2>
+            <div class="flex justify-center gap-4">
+                <button onclick="selectGameMode(5)" class="px-10 py-5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl text-2xl">5 VS 5</button>
+                <button onclick="selectGameMode(10)" class="px-10 py-5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl text-2xl">10 VS 10</button>
+                <button onclick="selectGameMode(20)" class="px-10 py-5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl text-2xl">20 VS 20</button>
             </div>
         </div>
 
-        <!-- DECK -->
+        <!-- 덱 화면 -->
         <div id="deck-screen" class="section">
-            <div class="flex justify-between mb-4">
+            <div class="flex justify-between items-center mb-6">
                 <div>
-                    <span id="mode-badge" class="text-2xl font-bold"></span>
-                    <span class="ml-4 text-sm text-zinc-400">실제 데이터 로드됨</span>
+                    <span id="mode-text" class="text-2xl font-bold"></span>
+                    <span class="ml-4 text-sm text-emerald-400">실제 데이터 로드 완료</span>
                 </div>
-                <div>
-                    <button onclick="changeDeck()" class="px-5 py-2 bg-zinc-800 rounded mr-2">덱 변경 (3회)</button>
-                    <button onclick="confirmDeck()" class="px-6 py-2 bg-red-600 rounded font-bold">배틀 시작</button>
+                <div class="flex gap-3">
+                    <button onclick="changeDeck()" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm">덱 변경 (3회)</button>
+                    <button onclick="confirmDeck()" class="px-7 py-2.5 bg-red-600 hover:bg-red-500 rounded-xl font-bold">배틀 시작</button>
                 </div>
             </div>
-            <div id="deck-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+            <div id="deck-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"></div>
         </div>
 
-        <!-- BATTLE -->
+        <!-- 배틀 화면 (간단 버전) -->
         <div id="battle-screen" class="section">
-            <div class="mb-4 flex justify-between">
-                <div id="battle-info" class="text-xl font-bold"></div>
-                <div><span class="text-emerald-400">WIN</span> <span id="win-count">0</span> / <span class="text-red-400">LOSE</span> <span id="lose-count">0</span></div>
+            <div class="mb-4 flex justify-between items-center">
+                <div id="battle-status" class="text-xl font-bold"></div>
+                <div><span class="text-emerald-400">승</span> <span id="win-count" class="font-mono text-2xl">0</span> : <span class="text-red-400">패</span> <span id="lose-count" class="font-mono text-2xl">0</span></div>
             </div>
-            <div id="my-hand" class="flex flex-wrap gap-3"></div>
+            <div id="my-hand" class="flex flex-wrap gap-4"></div>
         </div>
     </div>
 
@@ -66,22 +72,19 @@
         const BASE = './';
         let cardPool = [];
 
-        // CSV 파싱 함수
-        function parseCSV(csvText) {
-            const lines = csvText.trim().split('\n');
+        // CSV 파싱
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
             const headers = lines[0].split(',');
-            
             return lines.slice(1).map(line => {
-                const values = line.split(',');
+                const vals = line.split(',');
                 const obj = {};
-                headers.forEach((header, i) => {
-                    obj[header.trim()] = values[i] ? values[i].trim() : '';
-                });
+                headers.forEach((h, i) => obj[h.trim()] = vals[i] ? vals[i].trim() : '');
                 return {
                     id: obj.id,
                     name: obj.name,
                     gender: obj.gender,
-                    age: parseInt(obj.age),
+                    age: parseInt(obj.age) || 0,
                     region: obj.region,
                     grade: obj.grade,
                     class: obj.class,
@@ -91,33 +94,27 @@
             });
         }
 
-        // 실제 데이터 로드
         async function loadRealData() {
             try {
                 const res = await fetch('https://raw.githubusercontent.com/steveJea/vr-ideal-worldcup/main/VR_DATA.csv');
                 const text = await res.text();
                 cardPool = parseCSV(text);
-                console.log(`[성공] ${cardPool.length}장의 실제 카드 데이터를 로드했습니다.`);
+                console.log(`[성공] 실제 카드 ${cardPool.length}장 로드 완료`);
             } catch (e) {
-                console.error('CSV 로드 실패. 샘플 데이터 사용');
-                // 실패 시 최소 샘플
-                cardPool = [
-                    {id:"2000100001", name:"Lim Yu-ri", gender:"female", age:16, region:"Gangnam-gu", grade:"ULTRA RARE", class:"dark", attribute:"fascination", power:2452},
-                    {id:"2002000352", name:"Kim Ji-woo", gender:"female", age:18, region:"Yongsan-gu", grade:"HIGH RARE", class:"light", attribute:"support", power:996}
-                ];
+                console.error('데이터 로드 실패', e);
+                alert('실제 데이터를 불러오는데 실패했습니다. 샘플 데이터로 진행합니다.');
             }
         }
 
-        let gameState = { mode:5, playerDeck:[], remainingPlayer:[], remainingOpp:[], wins:0, loses:0, selectedCardId:null };
+        let gameState = { mode: 5, playerDeck: [], remainingPlayer: [], remainingOpp: [], wins: 0, loses: 0 };
 
         function getGradeColor(g) {
-            return { "NORMAL":"slate", "RARE":"blue", "HIGH RARE":"violet", "SUPER RARE":"pink", "ULTRA RARE":"amber", "MYTHIC RARE":"red" }[g] || "slate";
+            return { "NORMAL":"slate","RARE":"blue","HIGH RARE":"violet","SUPER RARE":"pink","ULTRA RARE":"amber","MYTHIC RARE":"red" }[g] || "slate";
         }
 
-        function shuffle(a){ return [...a].sort(()=>Math.random()-0.5); }
+        function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
         function dealCards(mode) {
-            // 간단하게 전체에서 랜덤 추출 (실제로는 등급 분포에 맞춰야 하지만 우선 동작하게)
             return shuffle(cardPool).slice(0, mode);
         }
 
@@ -131,27 +128,36 @@
         function selectGameMode(m) {
             gameState.mode = m;
             gameState.playerDeck = dealCards(m);
-            gameState.remainingPlayer = [...gameState.playerDeck];
-            gameState.wins = 0; gameState.loses = 0;
             showDeckScreen();
         }
 
         function showDeckScreen() {
             showScreen('deck-screen');
-            document.getElementById('mode-badge').innerText = `${gameState.mode} VS ${gameState.mode}`;
+            document.getElementById('mode-text').innerText = `${gameState.mode} VS ${gameState.mode}`;
             renderDeckGrid();
         }
 
         function renderDeckGrid() {
             const grid = document.getElementById('deck-grid');
             grid.innerHTML = '';
+
             gameState.playerDeck.forEach(card => {
                 const el = document.createElement('div');
-                el.className = `bg-zinc-900 border border-zinc-700 rounded-2xl p-4 cursor-pointer hover:border-violet-400`;
+                el.className = `tournament-card bg-zinc-900 border border-zinc-700 hover:border-violet-400 rounded-2xl p-4 cursor-pointer`;
+
+                const placeholder = `https://picsum.photos/id/${(parseInt(card.id) % 200) + 29}/300/380`;
+
                 el.innerHTML = `
+                    <div class="relative mb-3">
+                        <img src="${placeholder}" class="w-full aspect-[4/3] object-cover rounded-xl" alt="${card.name}">
+                        <div class="absolute top-2 right-2 px-3 py-1 text-xs font-bold bg-black/70 rounded">${card.grade}</div>
+                    </div>
                     <div class="font-bold text-xl">${card.name}</div>
-                    <div class="text-sm text-zinc-400">${card.grade} • ${card.region}</div>
-                    <div class="mt-3 text-4xl font-black text-right">${card.power}</div>
+                    <div class="text-sm text-zinc-400">${card.region}</div>
+                    <div class="text-right mt-2">
+                        <span class="text-xs text-zinc-400">POWER</span>
+                        <span class="block text-4xl font-black">${card.power}</span>
+                    </div>
                 `;
                 el.onclick = () => showCardModal(card);
                 grid.appendChild(el);
@@ -159,7 +165,24 @@
         }
 
         function showCardModal(card) {
-            alert(`${card.name}\nGrade: ${card.grade}\nPower: ${card.power}\nRegion: ${card.region}`);
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-zinc-900 p-8 rounded-3xl max-w-md w-full mx-4">
+                    <div class="text-3xl font-bold mb-2">${card.name}</div>
+                    <div class="flex gap-4 text-sm mb-6">
+                        <div>${card.grade}</div>
+                        <div>${card.region}</div>
+                        <div>${card.age}세</div>
+                    </div>
+                    <div class="text-center mb-6">
+                        <div class="text-sm text-zinc-400">POWER</div>
+                        <div class="text-7xl font-black">${card.power}</div>
+                    </div>
+                    <button onclick="this.closest('.fixed').remove()" class="w-full py-3 bg-zinc-800 rounded-2xl">닫기</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
         }
 
         function changeDeck() {
@@ -169,12 +192,15 @@
 
         function confirmDeck() {
             gameState.remainingPlayer = [...gameState.playerDeck];
-            gameState.remainingOpp = shuffle([...cardPool]).slice(0, gameState.mode);
+            gameState.remainingOpp = shuffle(cardPool).slice(0, gameState.mode);
+            gameState.wins = 0;
+            gameState.loses = 0;
             showBattleScreen();
         }
 
         function showBattleScreen() {
             showScreen('battle-screen');
+            document.getElementById('battle-status').innerText = `배틀 진행 중 (${gameState.mode}장)`;
             renderMyHand();
         }
 
@@ -183,50 +209,51 @@
             container.innerHTML = '';
             gameState.remainingPlayer.forEach(card => {
                 const el = document.createElement('div');
-                el.className = `bg-zinc-900 border border-white/30 p-4 rounded-2xl cursor-pointer w-44`;
-                el.innerHTML = `<div class="font-bold">${card.name}</div><div class="text-3xl font-black text-right">${card.power}</div>`;
-                el.onclick = () => selectCardToBattle(card, el);
+                el.className = `bg-zinc-900 border border-zinc-700 p-4 rounded-2xl w-48 cursor-pointer`;
+                el.innerHTML = `
+                    <div class="font-bold">${card.name}</div>
+                    <div class="text-5xl font-black text-right mt-2">${card.power}</div>
+                `;
+                el.onclick = () => playCard(card, el);
                 container.appendChild(el);
             });
         }
 
-        function selectCardToBattle(myCard, el) {
+        function playCard(myCard, element) {
             if (gameState.remainingOpp.length === 0) return;
 
             const oppCard = gameState.remainingOpp.shift();
-            const myWin = myCard.power > oppCard.power;
+            const win = myCard.power > oppCard.power;
 
-            if (myWin) gameState.wins++;
+            if (win) gameState.wins++;
             else gameState.loses++;
 
-            alert(`${myCard.name} (${myCard.power}) vs ${oppCard.name} (${oppCard.power})\n\n${myWin ? 'WIN!' : 'LOSE'}`);
+            alert(`${myCard.name} (${myCard.power}) vs ${oppCard.name} (${oppCard.power})\n\n${win ? '승리!' : '패배'}`);
 
-            // 카드 제거
             gameState.remainingPlayer = gameState.remainingPlayer.filter(c => c.id !== myCard.id);
+            document.getElementById('win-count').innerText = gameState.wins;
+            document.getElementById('lose-count').innerText = gameState.loses;
+
             renderMyHand();
 
             if (gameState.remainingPlayer.length === 0) {
-                finishGame();
+                setTimeout(() => {
+                    alert(`게임 종료! ${gameState.wins}승 ${gameState.loses}패`);
+                    showScreen('main-screen');
+                }, 300);
             }
-        }
-
-        function finishGame() {
-            const isWin = gameState.wins > gameState.loses;
-            alert(`게임 종료!\n${gameState.wins}승 ${gameState.loses}패\n${isWin ? '당신의 승리!' : '패배...'}`);
-            showScreen('main-screen');
         }
 
         function restartGame() {
             location.reload();
         }
 
-        async function initGame() {
-            await loadRealData();           // ← 여기서 실제 CSV 로드
+        async function init() {
+            await loadRealData();
             showScreen('main-screen');
-            console.log('%c[완료] 실제 VR_DATA.csv 기반으로 게임이 준비되었습니다.', 'color:#22c55e');
         }
 
-        window.onload = initGame;
+        window.onload = init;
     </script>
 </body>
 </html>
