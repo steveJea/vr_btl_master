@@ -17,7 +17,6 @@
 </head>
 <body class="bg-zinc-950 text-white">
     <div class="max-w-7xl mx-auto p-6">
-        <!-- 헤더 -->
         <div class="flex justify-between items-center mb-8">
             <div>
                 <span class="title-font text-4xl">VR BATTLE MASTERS</span>
@@ -26,10 +25,10 @@
             <button onclick="restartGame()" class="px-4 py-2 bg-zinc-800 rounded text-sm">처음으로</button>
         </div>
 
-        <!-- 메인 화면 -->
+        <!-- 메인 -->
         <div id="main-screen" class="section active text-center py-16">
             <h1 class="text-7xl font-black mb-4">VIOLENCE ROYALE</h1>
-            <p class="text-xl text-zinc-400 mb-10">실제 VR_DATA.csv 기반 카드 배틀</p>
+            <p class="text-xl text-zinc-400 mb-10">실제 VR_DATA.csv 기반</p>
             <button onclick="startGame()" class="px-14 py-4 bg-red-600 text-xl font-bold rounded-2xl">게임 시작</button>
         </div>
 
@@ -48,7 +47,7 @@
             <div class="flex justify-between items-center mb-6">
                 <div>
                     <span id="mode-text" class="text-2xl font-bold"></span>
-                    <span class="ml-4 text-sm text-emerald-400">실제 데이터 로드 완료</span>
+                    <span class="ml-4 text-sm text-emerald-400">실제 데이터</span>
                 </div>
                 <div class="flex gap-3">
                     <button onclick="changeDeck()" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm">덱 변경 (3회)</button>
@@ -58,21 +57,23 @@
             <div id="deck-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"></div>
         </div>
 
-        <!-- 배틀 화면 (간단 버전) -->
+        <!-- 배틀 화면 -->
         <div id="battle-screen" class="section">
             <div class="mb-4 flex justify-between items-center">
                 <div id="battle-status" class="text-xl font-bold"></div>
-                <div><span class="text-emerald-400">승</span> <span id="win-count" class="font-mono text-2xl">0</span> : <span class="text-red-400">패</span> <span id="lose-count" class="font-mono text-2xl">0</span></div>
+                <div>
+                    <span class="text-emerald-400">승</span> <span id="win-count" class="font-mono text-2xl">0</span> 
+                    : <span class="text-red-400">패</span> <span id="lose-count" class="font-mono text-2xl">0</span>
+                </div>
             </div>
             <div id="my-hand" class="flex flex-wrap gap-4"></div>
         </div>
     </div>
 
     <script>
-        const BASE = './';
+        const IMAGE_BASE = 'https://raw.githubusercontent.com/steveJea/vr-ideal-worldcup/main/img/bt_img/';
         let cardPool = [];
 
-        // CSV 파싱
         function parseCSV(text) {
             const lines = text.trim().split('\n');
             const headers = lines[0].split(',');
@@ -101,16 +102,12 @@
                 cardPool = parseCSV(text);
                 console.log(`[성공] 실제 카드 ${cardPool.length}장 로드 완료`);
             } catch (e) {
-                console.error('데이터 로드 실패', e);
-                alert('실제 데이터를 불러오는데 실패했습니다. 샘플 데이터로 진행합니다.');
+                console.error('CSV 로드 실패', e);
+                alert('데이터를 불러오는데 실패했습니다.');
             }
         }
 
         let gameState = { mode: 5, playerDeck: [], remainingPlayer: [], remainingOpp: [], wins: 0, loses: 0 };
-
-        function getGradeColor(g) {
-            return { "NORMAL":"slate","RARE":"blue","HIGH RARE":"violet","SUPER RARE":"pink","ULTRA RARE":"amber","MYTHIC RARE":"red" }[g] || "slate";
-        }
 
         function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
 
@@ -145,11 +142,16 @@
                 const el = document.createElement('div');
                 el.className = `tournament-card bg-zinc-900 border border-zinc-700 hover:border-violet-400 rounded-2xl p-4 cursor-pointer`;
 
+                // 정확한 이미지 경로
+                const imgSrc = `${IMAGE_BASE}${card.id}.jpg`;
                 const placeholder = `https://picsum.photos/id/${(parseInt(card.id) % 200) + 29}/300/380`;
 
                 el.innerHTML = `
                     <div class="relative mb-3">
-                        <img src="${placeholder}" class="w-full aspect-[4/3] object-cover rounded-xl" alt="${card.name}">
+                        <img src="${imgSrc}" 
+                             class="w-full aspect-[4/3] object-cover rounded-xl" 
+                             alt="${card.name}"
+                             onerror="this.src='${placeholder}'; this.onerror=null;">
                         <div class="absolute top-2 right-2 px-3 py-1 text-xs font-bold bg-black/70 rounded">${card.grade}</div>
                     </div>
                     <div class="font-bold text-xl">${card.name}</div>
@@ -170,16 +172,13 @@
             modal.innerHTML = `
                 <div class="bg-zinc-900 p-8 rounded-3xl max-w-md w-full mx-4">
                     <div class="text-3xl font-bold mb-2">${card.name}</div>
-                    <div class="flex gap-4 text-sm mb-6">
-                        <div>${card.grade}</div>
-                        <div>${card.region}</div>
-                        <div>${card.age}세</div>
-                    </div>
-                    <div class="text-center mb-6">
+                    <div class="text-sm text-zinc-400 mb-6">${card.grade} • ${card.region} • ${card.age}세</div>
+                    <div class="text-center mb-8">
                         <div class="text-sm text-zinc-400">POWER</div>
                         <div class="text-7xl font-black">${card.power}</div>
                     </div>
-                    <button onclick="this.closest('.fixed').remove()" class="w-full py-3 bg-zinc-800 rounded-2xl">닫기</button>
+                    <button onclick="this.closest('.fixed').remove()" 
+                            class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl">닫기</button>
                 </div>
             `;
             document.body.appendChild(modal);
@@ -200,7 +199,9 @@
 
         function showBattleScreen() {
             showScreen('battle-screen');
-            document.getElementById('battle-status').innerText = `배틀 진행 중 (${gameState.mode}장)`;
+            document.getElementById('battle-status').innerText = `배틀 진행 중`;
+            document.getElementById('win-count').innerText = '0';
+            document.getElementById('lose-count').innerText = '0';
             renderMyHand();
         }
 
@@ -214,12 +215,12 @@
                     <div class="font-bold">${card.name}</div>
                     <div class="text-5xl font-black text-right mt-2">${card.power}</div>
                 `;
-                el.onclick = () => playCard(card, el);
+                el.onclick = () => playBattle(card, el);
                 container.appendChild(el);
             });
         }
 
-        function playCard(myCard, element) {
+        function playBattle(myCard, element) {
             if (gameState.remainingOpp.length === 0) return;
 
             const oppCard = gameState.remainingOpp.shift();
@@ -228,19 +229,19 @@
             if (win) gameState.wins++;
             else gameState.loses++;
 
-            alert(`${myCard.name} (${myCard.power}) vs ${oppCard.name} (${oppCard.power})\n\n${win ? '승리!' : '패배'}`);
-
-            gameState.remainingPlayer = gameState.remainingPlayer.filter(c => c.id !== myCard.id);
             document.getElementById('win-count').innerText = gameState.wins;
             document.getElementById('lose-count').innerText = gameState.loses;
 
+            alert(`${myCard.name} (${myCard.power}) vs ${oppCard.name} (${oppCard.power})\n\n${win ? '승리!' : '패배'}`);
+
+            gameState.remainingPlayer = gameState.remainingPlayer.filter(c => c.id !== myCard.id);
             renderMyHand();
 
             if (gameState.remainingPlayer.length === 0) {
                 setTimeout(() => {
-                    alert(`게임 종료! ${gameState.wins}승 ${gameState.loses}패`);
+                    alert(`게임 종료!\n${gameState.wins}승 ${gameState.loses}패`);
                     showScreen('main-screen');
-                }, 300);
+                }, 400);
             }
         }
 
