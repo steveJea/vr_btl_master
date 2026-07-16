@@ -3,71 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VR BATTLE MASTERS</title>
+    <title>VR BATTLE MASTERS • Real Data</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body { font-family: system-ui, sans-serif; }
-        .title-font { font-family: 'Anton', Impact, system-ui, sans-serif; }
-        .section { display: none !important; }
-        .section.active { display: block !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Anton&amp;family=Inter:wght@400;600&amp;family=Press+Start+2P&amp;display=swap');
+        
+        body { font-family: 'Inter', system_ui, sans-serif; }
+        .title-font { font-family: 'Anton', Impact, system-ui, sans-serif; letter-spacing: 2px; }
+        .game-bg { background: linear-gradient(180deg, #0a0a0a 0%, #1a0f0f 50%, #0a0a0a 100%); }
+        .section { display: none; }
+        .section.active { display: block; }
+        .card { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card:hover { transform: translateY(-4px) scale(1.02); }
+        .gold-glow { box-shadow: 0 0 15px #fbbf24, 0 0 30px #fbbf24; animation: gold-pulse 1.5s infinite; }
+        .cracked::after { content: ''; position: absolute; inset: 0; background: linear-gradient(45deg, transparent 40%, rgba(239,68,68,.6) 40%, rgba(239,68,68,.6) 42%, transparent 42%), linear-gradient(-45deg, transparent 58%, rgba(239,68,68,.5) 58%, rgba(239,68,68,.5) 60%, transparent 60%); background-size: 20px 20px; pointer-events: none; animation: crack-appear .35s ease forwards; z-index: 2; }
+        @keyframes gold-pulse { 50% { box-shadow: 0 0 25px #fbbf24, 0 0 45px #fbbf24; } }
+        @keyframes crack-appear { from { opacity:0; } to { opacity:1; } }
+        .vs-impact { animation: impact-shake .55s ease-in-out; }
+        @keyframes impact-shake { 20%{transform:translateX(-6px) rotate(-1deg)} 40%{transform:translateX(6px) rotate(1deg)} }
+        .deck-grid { scrollbar-width: thin; scrollbar-color: #475569 #1e2937; }
+        .modal { animation: modal-pop .2s ease-out forwards; }
+        @keyframes modal-pop { from {opacity:0; transform:scale(.96) translateY(8px)} to {opacity:1; transform:scale(1) translateY(0)} }
         .tournament-card { transition: all 0.2s ease; }
         .tournament-card:hover { transform: translateY(-3px); }
     </style>
 </head>
-<body class="bg-zinc-950 text-white">
-    <div class="max-w-7xl mx-auto p-6">
-        <div class="flex justify-between items-center mb-8">
+<body class="bg-zinc-950 text-white game-bg min-h-screen">
+    <!-- Header -->
+    <div class="border-b border-zinc-800 bg-black/60 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-x-3">
+                <div class="w-10 h-10 bg-red-600 flex items-center justify-center rounded"><i class="fa-solid fa-skull text-2xl"></i></div>
+                <div>
+                    <span class="title-font text-2xl tracking-[3px] font-bold">VIOLENCE ROYALE</span>
+                    <span class="text-xs text-red-500 block -mt-1 tracking-[2px]">THE BRUTAL CITY</span>
+                </div>
+            </div>
+            <div onclick="restartGame()" class="cursor-pointer flex items-center gap-x-2 px-4 py-1.5 hover:bg-zinc-900 rounded-lg text-sm">
+                <i class="fa-solid fa-home text-red-500"></i>
+                <span>HOME</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SCREEN -->
+    <div id="main-screen" class="section active min-h-[calc(100vh-73px)] flex items-center justify-center">
+        <div class="text-center px-6 max-w-4xl">
+            <div class="mb-8">
+                <div class="inline-flex items-center gap-x-4 mb-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center rounded-2xl shadow-2xl">
+                        <i class="fa-solid fa-fist-raised text-white text-5xl"></i>
+                    </div>
+                </div>
+                <h1 class="title-font text-[92px] leading-[78px] tracking-[-2px] font-black mb-1">
+                    <span class="bg-gradient-to-r from-red-500 via-red-600 to-red-500 bg-clip-text text-transparent">VIOLENCE</span><br>
+                    <span class="text-white">ROYALE</span>
+                </h1>
+                <div class="text-red-500 text-3xl tracking-[8px] font-bold -mt-3">THE BRUTAL CITY</div>
+                <div class="text-6xl title-font tracking-[6px] text-white/90">BATTLE MASTERS</div>
+            </div>
+            <p class="text-zinc-400 text-lg mb-10">카드의 힘으로 잔혹한 도시를 지배하라.<br>POWER가 모든 것을 결정한다.</p>
+            <button onclick="startGame()" class="px-14 py-5 bg-red-600 hover:bg-red-500 text-2xl font-bold tracking-widest rounded-2xl shadow-xl">PRESS ANY KEY TO START</button>
+        </div>
+    </div>
+
+    <!-- CHOICE SCREEN -->
+    <div id="choice-screen" class="section min-h-[calc(100vh-73px)] flex items-center justify-center py-12">
+        <div class="max-w-5xl w-full px-6">
+            <div class="text-center mb-10">
+                <div class="text-red-500 text-sm tracking-[3px] font-bold mb-1">SELECT GAME MODE</div>
+                <h2 class="title-font text-6xl tracking-tight">게임 방식을 선택하세요</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div onclick="selectGameMode(5)" class="cursor-pointer bg-zinc-900 border border-zinc-700 hover:border-red-600 rounded-3xl p-8 transition-all">
+                    <div class="text-6xl font-black title-font tracking-tighter">5 VS 5</div>
+                    <div class="mt-6 text-sm space-y-2 text-zinc-300">
+                        <div class="flex justify-between"><span>NORMAL</span><span class="font-mono">2</span></div>
+                        <div class="flex justify-between"><span>RARE</span><span class="font-mono">1</span></div>
+                        <div class="flex justify-between"><span>HIGH RARE</span><span class="font-mono">1</span></div>
+                        <div class="flex justify-between"><span>ULTRA RARE</span><span class="font-mono">1</span></div>
+                    </div>
+                </div>
+                <div onclick="selectGameMode(10)" class="cursor-pointer bg-zinc-900 border border-zinc-700 hover:border-red-600 rounded-3xl p-8 transition-all relative">
+                    <div class="absolute -top-2 -right-2 bg-red-600 text-xs px-3 py-0.5 rounded font-bold">RECOMMENDED</div>
+                    <div class="text-6xl font-black title-font tracking-tighter">10 VS 10</div>
+                    <div class="mt-6 text-sm space-y-2 text-zinc-300">
+                        <div class="flex justify-between"><span>NORMAL</span><span class="font-mono">5</span></div>
+                        <div class="flex justify-between"><span>RARE</span><span class="font-mono">2</span></div>
+                        <div class="flex justify-between"><span>HIGH RARE</span><span class="font-mono">1</span></div>
+                        <div class="flex justify-between"><span>SUPER RARE</span><span class="font-mono">1</span></div>
+                        <div class="flex justify-between"><span>ULTRA RARE</span><span class="font-mono">1</span></div>
+                    </div>
+                </div>
+                <div onclick="selectGameMode(20)" class="cursor-pointer bg-zinc-900 border border-zinc-700 hover:border-red-600 rounded-3xl p-8 transition-all">
+                    <div class="text-6xl font-black title-font tracking-tighter">20 VS 20</div>
+                    <div class="mt-6 text-sm space-y-2 text-zinc-300">
+                        <div class="flex justify-between"><span>NORMAL</span><span class="font-mono">10</span></div>
+                        <div class="flex justify-between"><span>RARE</span><span class="font-mono">4</span></div>
+                        <div class="flex justify-between"><span>HIGH RARE</span><span class="font-mono">2</span></div>
+                        <div class="flex justify-between"><span>SUPER RARE</span><span class="font-mono">2</span></div>
+                        <div class="flex justify-between"><span>ULTRA RARE</span><span class="font-mono">1</span></div>
+                        <div class="flex justify-between"><span class="text-red-400">MYTHIC RARE</span><span class="font-mono">1</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DECK SCREEN -->
+    <div id="deck-screen" class="section py-8">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-end justify-between mb-6">
+                <div>
+                    <span class="px-4 py-1 bg-red-600 text-xs font-bold tracking-widest rounded">DECK PREPARATION</span>
+                    <span id="mode-badge" class="text-2xl font-bold ml-3"></span>
+                </div>
+                <div class="flex gap-x-3">
+                    <button onclick="changeDeck()" id="change-btn" class="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 hover:border-amber-400 rounded-2xl text-sm font-semibold disabled:opacity-40">덱 변경 <span id="change-count">3/3</span></button>
+                    <button onclick="confirmDeck()" class="px-8 py-3.5 bg-red-600 hover:bg-red-500 rounded-2xl font-bold text-lg">덱 확인 및 배틀 시작</button>
+                </div>
+            </div>
+            <div id="deck-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
+        </div>
+    </div>
+
+    <!-- BATTLE SCREEN -->
+    <div id="battle-screen" class="section py-6">
+        <div class="max-w-[1180px] mx-auto px-5">
+            <div class="flex justify-between mb-4">
+                <div><span id="battle-progress" class="text-4xl font-black title-font tracking-tighter">01 / 05</span></div>
+                <div class="flex gap-x-6 text-sm bg-zinc-900 border border-zinc-700 px-5 py-2 rounded-2xl">
+                    <div><span class="text-emerald-400 font-bold">WIN</span> <span id="win-count" class="font-mono text-2xl font-bold">0</span></div>
+                    <div><span class="text-red-400 font-bold">LOSE</span> <span id="lose-count" class="font-mono text-2xl font-bold">0</span></div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="flex justify-between text-xs px-2 mb-1 text-red-400"><span>OPPONENT DECK (HIDDEN)</span></div>
+                <div class="flex gap-x-2">
+                    <div id="opp-used" class="flex gap-x-1 pr-3 border-r border-zinc-700 min-h-[52px]"></div>
+                    <div id="opp-remaining" class="flex-1 flex gap-x-1.5 overflow-x-auto"></div>
+                </div>
+            </div>
+
+            <div id="vs-zone" class="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 mb-4 min-h-[280px] flex items-center justify-center">
+                <div id="vs-content" class="w-full max-w-[820px]">
+                    <div id="vs-idle" class="text-center"><p class="text-zinc-400">아래에서 카드를 선택하여 배틀을 시작하세요</p></div>
+                    <div id="vs-countdown" class="hidden text-center"><div id="countdown-num" class="text-[92px] font-black title-font tracking-[-6px] text-red-500">3</div></div>
+                    <div id="vs-battle" class="hidden">
+                        <div class="flex justify-center gap-x-8">
+                            <div class="w-[190px]"><div class="text-emerald-400 text-xs mb-1 font-bold">YOUR CARD</div><div id="vs-my-card" class="battle-card w-full bg-zinc-800 border-2 border-emerald-500 rounded-2xl overflow-hidden"></div></div>
+                            <div class="pt-7"><div class="text-7xl font-black title-font text-white/70">VS</div></div>
+                            <div class="w-[190px]"><div class="text-red-400 text-xs mb-1 font-bold">OPPONENT</div><div id="vs-opp-card" class="battle-card w-full bg-zinc-800 border-2 border-red-500 rounded-2xl overflow-hidden"></div></div>
+                        </div>
+                        <div id="battle-result-stamp" class="hidden mt-5 text-center"><div id="result-text" class="inline-block text-5xl font-black tracking-[3px]"></div></div>
+                    </div>
+                </div>
+            </div>
+
             <div>
-                <span class="title-font text-4xl">VR BATTLE MASTERS</span>
-                <span class="ml-3 text-red-500 text-sm">Real Data</span>
-            </div>
-            <button onclick="restartGame()" class="px-4 py-2 bg-zinc-800 rounded text-sm">처음으로</button>
-        </div>
-
-        <!-- 메인 -->
-        <div id="main-screen" class="section active text-center py-16">
-            <h1 class="text-7xl font-black mb-4">VIOLENCE ROYALE</h1>
-            <p class="text-xl text-zinc-400 mb-10">실제 VR_DATA.csv 기반</p>
-            <button onclick="startGame()" class="px-14 py-4 bg-red-600 text-xl font-bold rounded-2xl">게임 시작</button>
-        </div>
-
-        <!-- 모드 선택 -->
-        <div id="choice-screen" class="section text-center py-10">
-            <h2 class="text-3xl mb-8">게임 모드 선택</h2>
-            <div class="flex justify-center gap-4">
-                <button onclick="selectGameMode(5)" class="px-10 py-5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl text-2xl">5 VS 5</button>
-                <button onclick="selectGameMode(10)" class="px-10 py-5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl text-2xl">10 VS 10</button>
-                <button onclick="selectGameMode(20)" class="px-10 py-5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 rounded-2xl text-2xl">20 VS 20</button>
+                <div class="flex justify-between px-2 mb-2"><span class="font-bold text-emerald-400">YOUR HAND</span><span id="hand-count" class="text-xs text-emerald-300/70"></span></div>
+                <div id="my-hand" class="flex gap-x-3 overflow-x-auto pb-3 deck-grid snap-x"></div>
             </div>
         </div>
+    </div>
 
-        <!-- 덱 화면 -->
-        <div id="deck-screen" class="section">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <span id="mode-text" class="text-2xl font-bold"></span>
-                    <span class="ml-4 text-sm text-emerald-400">실제 데이터</span>
-                </div>
-                <div class="flex gap-3">
-                    <button onclick="changeDeck()" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm">덱 변경 (3회)</button>
-                    <button onclick="confirmDeck()" class="px-7 py-2.5 bg-red-600 hover:bg-red-500 rounded-xl font-bold">배틀 시작</button>
-                </div>
-            </div>
-            <div id="deck-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"></div>
+    <!-- RESULT SCREEN -->
+    <div id="result-screen" class="section py-10">
+        <div class="max-w-5xl mx-auto px-6 text-center">
+            <div id="final-result-text" class="text-7xl font-black title-font tracking-tighter mb-2"></div>
+            <div id="final-score" class="text-3xl font-mono text-zinc-300 mb-8"></div>
+            <button onclick="restartGame()" class="px-10 py-4 bg-white text-black font-bold rounded-2xl">메인으로 돌아가기</button>
         </div>
+    </div>
 
-        <!-- 배틀 화면 -->
-        <div id="battle-screen" class="section">
-            <div class="mb-4 flex justify-between items-center">
-                <div id="battle-status" class="text-xl font-bold"></div>
-                <div>
-                    <span class="text-emerald-400">승</span> <span id="win-count" class="font-mono text-2xl">0</span> 
-                    : <span class="text-red-400">패</span> <span id="lose-count" class="font-mono text-2xl">0</span>
-                </div>
-            </div>
-            <div id="my-hand" class="flex flex-wrap gap-4"></div>
-        </div>
+    <!-- Card Modal -->
+    <div id="card-modal" onclick="if(event.target.id==='card-modal') hideCardModal()" class="hidden fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-6">
+        <div onclick="event.stopImmediatePropagation()" class="modal bg-zinc-900 border border-zinc-700 max-w-md w-full rounded-3xl overflow-hidden" id="modal-content"></div>
     </div>
 
     <script>
@@ -82,15 +195,9 @@
                 const obj = {};
                 headers.forEach((h, i) => obj[h.trim()] = vals[i] ? vals[i].trim() : '');
                 return {
-                    id: obj.id,
-                    name: obj.name,
-                    gender: obj.gender,
-                    age: parseInt(obj.age) || 0,
-                    region: obj.region,
-                    grade: obj.grade,
-                    class: obj.class,
-                    attribute: obj.attribute,
-                    power: parseInt(obj.power) || 0
+                    id: obj.id, name: obj.name, gender: obj.gender, age: parseInt(obj.age)||0,
+                    region: obj.region, grade: obj.grade, class: obj.class, attribute: obj.attribute,
+                    power: parseInt(obj.power)||0
                 };
             });
         }
@@ -101,160 +208,183 @@
                 const text = await res.text();
                 cardPool = parseCSV(text);
                 console.log(`[성공] 실제 카드 ${cardPool.length}장 로드 완료`);
-            } catch (e) {
+            } catch(e) {
                 console.error('CSV 로드 실패', e);
-                alert('데이터를 불러오는데 실패했습니다.');
             }
         }
 
-        let gameState = { mode: 5, playerDeck: [], remainingPlayer: [], remainingOpp: [], wins: 0, loses: 0 };
+        let gameState = { mode:5, playerDeck:[], opponentDeck:[], remainingPlayer:[], remainingOpp:[], usedPlayer:[], usedOpp:[], battleLog:[], changeCount:3, currentBattle:0, wins:0, loses:0, selectedCardId:null, isBattling:false };
 
-        function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+        function getGradeColor(g){ return {"NORMAL":"slate","RARE":"blue","HIGH RARE":"violet","SUPER RARE":"pink","ULTRA RARE":"amber","MYTHIC RARE":"red"}[g]||"slate"; }
+        function getGradeBorder(g){ return `border-${getGradeColor(g)}-500`; }
+        function shuffleArray(a){ return [...a].sort(()=>Math.random()-0.5); }
 
-        function dealCards(mode) {
-            return shuffle(cardPool).slice(0, mode);
+        function dealCards(mode){
+            const dist = {5:{"NORMAL":2,"RARE":1,"HIGH RARE":1,"SUPER RARE":0,"ULTRA RARE":1,"MYTHIC RARE":0},10:{"NORMAL":5,"RARE":2,"HIGH RARE":1,"SUPER RARE":1,"ULTRA RARE":1,"MYTHIC RARE":0},20:{"NORMAL":10,"RARE":4,"HIGH RARE":2,"SUPER RARE":2,"ULTRA RARE":1,"MYTHIC RARE":1}}[mode];
+            let dealt=[], avail=[...cardPool];
+            Object.keys(dist).forEach(gr => {
+                let need = dist[gr]; if(!need) return;
+                let gc = shuffleArray(avail.filter(c=>c.grade===gr));
+                for(let i=0; i<Math.min(need, gc.length); i++){ dealt.push({...gc[i]}); avail = avail.filter(c=>c.id!==gc[i].id); }
+            });
+            while(dealt.length < mode && avail.length){ let r = Math.floor(Math.random()*avail.length); dealt.push({...avail[r]}); avail.splice(r,1); }
+            return shuffleArray(dealt);
         }
 
-        function showScreen(id) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+        function showScreen(id){
+            document.querySelectorAll('.section').forEach(s => { s.classList.remove('active'); s.style.display='none'; });
+            const t = document.getElementById(id); if(t){ t.classList.add('active'); t.style.display='block'; }
         }
 
-        function startGame() { showScreen('choice-screen'); }
+        function startGame(){ showScreen('choice-screen'); }
 
-        function selectGameMode(m) {
-            gameState.mode = m;
-            gameState.playerDeck = dealCards(m);
+        function selectGameMode(m){
+            gameState.mode = m; gameState.changeCount = 3;
+            gameState.playerDeck = dealCards(m); gameState.opponentDeck = dealCards(m);
+            gameState.remainingPlayer = [...gameState.playerDeck]; gameState.remainingOpp = [...gameState.opponentDeck];
+            gameState.usedPlayer=[]; gameState.usedOpp=[]; gameState.battleLog=[]; gameState.currentBattle=0; gameState.wins=0; gameState.loses=0;
             showDeckScreen();
         }
 
-        function showDeckScreen() {
+        function showDeckScreen(){
             showScreen('deck-screen');
-            document.getElementById('mode-text').innerText = `${gameState.mode} VS ${gameState.mode}`;
+            document.getElementById('mode-badge').innerHTML = `${gameState.mode} VS ${gameState.mode}`;
+            document.getElementById('change-count').innerText = `${gameState.changeCount}/3`;
+            document.getElementById('change-btn').disabled = gameState.changeCount <= 0;
             renderDeckGrid();
         }
 
-        function renderDeckGrid() {
-            const grid = document.getElementById('deck-grid');
-            grid.innerHTML = '';
-
+        function renderDeckGrid(){
+            const grid = document.getElementById('deck-grid'); grid.innerHTML = '';
             gameState.playerDeck.forEach(card => {
-                const el = document.createElement('div');
-                el.className = `tournament-card bg-zinc-900 border border-zinc-700 hover:border-violet-400 rounded-2xl p-4 cursor-pointer`;
-
-                // 정확한 이미지 경로
-const imgSrc = `https://raw.githubusercontent.com/steveJea/vr-ideal-worldcup/main/img/bt_img/${card.id}.jpg`;
-                const placeholder = `https://picsum.photos/id/${(parseInt(card.id) % 200) + 29}/300/380`;
-
-                el.innerHTML = `
-                    <div class="relative mb-3">
-                        <img src="${imgSrc}" 
-                             class="w-full aspect-[4/3] object-cover rounded-xl" 
-                             alt="${card.name}"
-                             onerror="this.src='${placeholder}'; this.onerror=null;">
-                        <div class="absolute top-2 right-2 px-3 py-1 text-xs font-bold bg-black/70 rounded">${card.grade}</div>
-                    </div>
-                    <div class="font-bold text-xl">${card.name}</div>
-                    <div class="text-sm text-zinc-400">${card.region}</div>
-                    <div class="text-right mt-2">
-                        <span class="text-xs text-zinc-400">POWER</span>
-                        <span class="block text-4xl font-black">${card.power}</span>
-                    </div>
-                `;
-                el.onclick = () => showCardModal(card);
+                const el = createCardElement(card, true, true);
                 grid.appendChild(el);
             });
         }
 
-        function showCardModal(card) {
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black/80 flex items-center justify-center z-50';
-            modal.innerHTML = `
-                <div class="bg-zinc-900 p-8 rounded-3xl max-w-md w-full mx-4">
-                    <div class="text-3xl font-bold mb-2">${card.name}</div>
-                    <div class="text-sm text-zinc-400 mb-6">${card.grade} • ${card.region} • ${card.age}세</div>
-                    <div class="text-center mb-8">
-                        <div class="text-sm text-zinc-400">POWER</div>
-                        <div class="text-7xl font-black">${card.power}</div>
+        function createCardElement(card, clickable = true){
+            const el = document.createElement('div');
+            el.className = `card bg-zinc-900 border-2 ${getGradeBorder(card.grade)} rounded-2xl overflow-hidden cursor-pointer`;
+            const imgSrc = `${IMAGE_BASE}${card.id}.jpg`;
+            const placeholder = `https://picsum.photos/id/${(parseInt(card.id)%200)+29}/300/380`;
+            
+            el.innerHTML = `
+                <div class="relative">
+                    <img src="${imgSrc}" class="w-full h-48 object-cover" onerror="this.src='${placeholder}';this.onerror=null;">
+                    <div class="absolute top-2 right-2 px-3 py-0.5 text-[10px] font-bold bg-black/70 border border-white/20 rounded flex items-center gap-x-1">
+                        <span class="text-${getGradeColor(card.grade)}-400">●</span> <span>${card.grade}</span>
                     </div>
-                    <button onclick="this.closest('.fixed').remove()" 
-                            class="w-full py-3 bg-zinc-800 hover:bg-zinc-700 rounded-2xl">닫기</button>
+                    <div class="absolute bottom-2 right-2 bg-black/80 px-3 py-px rounded text-right">
+                        <div class="text-[9px] text-white/60 -mb-0.5">POWER</div>
+                        <div class="font-mono text-2xl font-black">${card.power}</div>
+                    </div>
+                </div>
+                <div class="p-3">
+                    <div class="font-bold text-lg">${card.name}</div>
+                    <div class="text-xs text-zinc-400">${card.age}세 • ${card.region}</div>
                 </div>
             `;
-            document.body.appendChild(modal);
+            if(clickable) el.onclick = () => showCardModal(card);
+            return el;
         }
 
-        function changeDeck() {
+        function changeDeck(){
+            if(gameState.changeCount <= 0) return;
+            gameState.changeCount--;
             gameState.playerDeck = dealCards(gameState.mode);
+            document.getElementById('change-count').innerText = `${gameState.changeCount}/3`;
             renderDeckGrid();
         }
 
-        function confirmDeck() {
+        function confirmDeck(){
             gameState.remainingPlayer = [...gameState.playerDeck];
-            gameState.remainingOpp = shuffle(cardPool).slice(0, gameState.mode);
-            gameState.wins = 0;
-            gameState.loses = 0;
+            gameState.remainingOpp = shuffleArray([...gameState.opponentDeck]);
             showBattleScreen();
         }
 
-        function showBattleScreen() {
+        function showBattleScreen(){
             showScreen('battle-screen');
-            document.getElementById('battle-status').innerText = `배틀 진행 중`;
-            document.getElementById('win-count').innerText = '0';
-            document.getElementById('lose-count').innerText = '0';
+            updateBattleUI();
             renderMyHand();
         }
 
-        function renderMyHand() {
-            const container = document.getElementById('my-hand');
-            container.innerHTML = '';
+        function updateBattleUI(){
+            const rem = gameState.remainingPlayer.length;
+            document.getElementById('battle-progress').innerHTML = `${String(gameState.mode-rem+1).padStart(2,'0')} / ${gameState.mode}`;
+            document.getElementById('win-count').innerText = gameState.wins;
+            document.getElementById('lose-count').innerText = gameState.loses;
+        }
+
+        function renderMyHand(){
+            const c = document.getElementById('my-hand'); c.innerHTML = '';
             gameState.remainingPlayer.forEach(card => {
                 const el = document.createElement('div');
-                el.className = `bg-zinc-900 border border-zinc-700 p-4 rounded-2xl w-48 cursor-pointer`;
+                el.className = `card flex-shrink-0 w-[138px] bg-zinc-900 border-2 ${getGradeBorder(card.grade)} rounded-2xl overflow-hidden cursor-pointer`;
+                const imgSrc = `${IMAGE_BASE}${card.id}.jpg`;
                 el.innerHTML = `
-                    <div class="font-bold">${card.name}</div>
-                    <div class="text-5xl font-black text-right mt-2">${card.power}</div>
+                    <div class="relative h-[118px]">
+                        <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/id/${(parseInt(card.id)%200)+29}/300/380'">
+                        <div class="absolute bottom-1.5 right-1.5 bg-black/80 px-2 py-0 rounded"><div class="font-mono text-xl font-black">${card.power}</div></div>
+                    </div>
+                    <div class="px-2.5 py-2"><div class="font-bold text-sm truncate">${card.name}</div></div>
                 `;
-                el.onclick = () => playBattle(card, el);
-                container.appendChild(el);
+                el.onclick = () => { gameState.selectedCardId = card.id; showDeployButton(card); };
+                c.appendChild(el);
             });
         }
 
-        function playBattle(myCard, element) {
-            if (gameState.remainingOpp.length === 0) return;
+        function showDeployButton(card){
+            const old = document.getElementById('deploy-bar'); if(old) old.remove();
+            const bar = document.createElement('div');
+            bar.id = 'deploy-bar';
+            bar.className = 'fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-yellow-500/40 p-4 z-40 flex justify-center';
+            bar.innerHTML = `<div class="max-w-md w-full flex items-center gap-x-4"><div class="flex-1"><div class="text-xs text-yellow-400">선택됨</div><div class="font-bold">${card.name} P${card.power}</div></div><button onclick="deploySelectedCard()" class="px-9 py-3.5 bg-yellow-400 text-black font-extrabold rounded-2xl">DEPLOY</button></div>`;
+            document.body.appendChild(bar);
+        }
 
-            const oppCard = gameState.remainingOpp.shift();
-            const win = myCard.power > oppCard.power;
-
-            if (win) gameState.wins++;
-            else gameState.loses++;
-
-            document.getElementById('win-count').innerText = gameState.wins;
-            document.getElementById('lose-count').innerText = gameState.loses;
-
-            alert(`${myCard.name} (${myCard.power}) vs ${oppCard.name} (${oppCard.power})\n\n${win ? '승리!' : '패배'}`);
-
+        async function deploySelectedCard(){
+            // 간단한 배틀 로직 (원본 스타일 유지하면서 최소 구현)
+            if(!gameState.selectedCardId || gameState.isBattling) return;
+            const myCard = gameState.remainingPlayer.find(c => c.id === gameState.selectedCardId);
+            if(!myCard) return;
+            document.getElementById('deploy-bar')?.remove();
             gameState.remainingPlayer = gameState.remainingPlayer.filter(c => c.id !== myCard.id);
             renderMyHand();
 
-            if (gameState.remainingPlayer.length === 0) {
-                setTimeout(() => {
-                    alert(`게임 종료!\n${gameState.wins}승 ${gameState.loses}패`);
-                    showScreen('main-screen');
-                }, 400);
-            }
+            if(gameState.remainingOpp.length === 0) return;
+            const oppCard = gameState.remainingOpp.splice(Math.floor(Math.random()*gameState.remainingOpp.length), 1)[0];
+
+            const myWin = myCard.power > oppCard.power;
+            if(myWin) gameState.wins++; else gameState.loses++;
+
+            alert(`${myCard.name} (${myCard.power}) vs ${oppCard.name} (${oppCard.power})\n\n${myWin ? 'WIN!' : 'LOSE'}`);
+
+            updateBattleUI();
+            if(gameState.remainingPlayer.length === 0) finishGame();
         }
 
-        function restartGame() {
-            location.reload();
+        function finishGame(){
+            showScreen('result-screen');
+            const isWin = gameState.wins > gameState.loses;
+            document.getElementById('final-result-text').innerHTML = isWin ? `YOUR <span class="text-emerald-400">VICTORY</span>` : `CITY <span class="text-red-500">DEFEAT</span>`;
+            document.getElementById('final-score').innerHTML = `${gameState.wins} WINS — ${gameState.loses} LOSES`;
         }
 
-        async function init() {
+        function showCardModal(card){
+            const modal = document.getElementById('card-modal');
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `<div class="p-6"><div class="text-3xl font-bold mb-2">${card.name}</div><div class="text-6xl font-black mb-4">${card.power}</div><div>${card.grade} • ${card.region}</div><button onclick="hideCardModal()" class="mt-6 w-full py-3 bg-zinc-800 rounded-2xl">닫기</button></div>`;
+            modal.classList.remove('hidden'); modal.classList.add('flex');
+        }
+        function hideCardModal(){ document.getElementById('card-modal').classList.add('hidden'); document.getElementById('card-modal').classList.remove('flex'); }
+
+        function restartGame(){ location.reload(); }
+
+        async function initGame(){
             await loadRealData();
             showScreen('main-screen');
         }
-
-        window.onload = init;
+        window.onload = initGame;
     </script>
 </body>
 </html>
