@@ -726,6 +726,13 @@ function renderBattleLog() {
             });
         }
         window.onload = init;
+        function hideCardModal() {
+    const modal = document.getElementById('card-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
     </script>
     <!-- Card Modal -->
 <div id="card-modal" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4" onclick="if(event.target.id==='card-modal')hideCardModal()">
@@ -733,12 +740,5 @@ function renderBattleLog() {
         <div id="modal-content"></div>
     </div>
 </div>
-function hideCardModal() {
-    const modal = document.getElementById('card-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-    }
-}
 </body>
 </html>
