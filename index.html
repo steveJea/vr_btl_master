@@ -596,17 +596,17 @@
             const imgSrc = `${IMAGE_BASE}${card.id}.jpg`;
 
             content.innerHTML = `
-                <div class="relative h-64">
-                    <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/id/29/300/380'">
-                    <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent"></div>
-                    <div class="absolute top-4 right-4">
-                        <span class="px-3 py-1 text-sm font-bold bg-black/60 rounded-full border border-white/20">${card.grade}</span>
-                    </div>
-                    <div class="absolute bottom-4 left-4 right-4">
-                        <div class="text-3xl font-black">${card.name}</div>
-                        <div class="text-white/70 text-sm">${card.age}세 • ${card.gender} • ${card.region}</div>
-                    </div>
-                </div>
+<div class="relative h-96">
+    <img src="${imgSrc}" class="w-full h-full object-cover object-top" onerror="this.src='https://picsum.photos/id/29/300/380'">
+    <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent"></div>
+    <div class="absolute top-4 right-4">
+        <span class="px-3 py-1 text-sm font-bold bg-black/60 rounded-full border border-white/20">${card.grade}</span>
+    </div>
+    <div class="absolute bottom-4 left-4 right-4">
+        <div class="text-3xl font-black">${card.name}</div>
+        <div class="text-white/70 text-sm">${card.age}세 • ${card.gender} • ${card.region}</div>
+    </div>
+</div>
                 <div class="p-5">
                     <div class="grid grid-cols-2 gap-4 text-sm mb-5">
                         <div>
