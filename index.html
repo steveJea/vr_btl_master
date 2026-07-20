@@ -705,8 +705,8 @@ function renderBattleLog() {
                     <div class="font-bold text-lg text-emerald-400">${card.attribute || '-'}</div>
                 </div>
             </div>
-            <button onclick="hideCardModal()" class="w-full py-3 border border-white/30 hover:bg-white/5 rounded-2xl">닫기</button>
-        </div>
+<button onclick="hideCardModal()" class="w-full py-3 border border-white/30 hover:bg-white/5 rounded-2xl">닫기</button>
+</div>
     `;
 
     modal.classList.remove('hidden');
@@ -733,5 +733,12 @@ function renderBattleLog() {
         <div id="modal-content"></div>
     </div>
 </div>
+function hideCardModal() {
+    const modal = document.getElementById('card-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
 </body>
 </html>
