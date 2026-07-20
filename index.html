@@ -670,46 +670,48 @@ function renderBattleLog() {
 
         // 상세 모달 - POWER 숨김 + 사진/정보 노출
         function showCardModal(card) {
-            const modal = document.getElementById('card-modal');
-            const content = document.getElementById('modal-content');
-            const imgSrc = `${IMAGE_BASE}${card.id}.jpg`;
+    if (!card) return;
 
-            content.innerHTML = `
-<div class="relative h-128">
-    <img src="${imgSrc}" class="w-full h-full object-cover object-top" onerror="this.src='https://picsum.photos/id/29/300/380'">
-    <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent"></div>
-    <div class="absolute top-4 right-4">
-        <span class="px-3 py-1 text-sm font-bold bg-black/60 rounded-full border border-white/20">${card.grade}</span>
-    </div>
-    <div class="absolute bottom-4 left-4 right-4">
-        <div class="text-3xl font-black">${card.name}</div>
-        <div class="text-white/70 text-sm">${card.age}세 • ${card.gender} • ${card.region}</div>
-    </div>
-</div>
-                <div class="p-5">
-                    <div class="grid grid-cols-2 gap-4 text-sm mb-5">
-                        <div>
-                            <div class="text-xs text-zinc-400">CLASS</div>
-                            <div class="font-bold text-lg">${card.class}</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-zinc-400">ATTRIBUTE</div>
-                            <div class="font-bold text-lg text-emerald-400">${card.attribute}</div>
-                        </div>
-                    </div>
-                    <button onclick="hideCardModal()" class="w-full py-3 border border-white/30 hover:bg-white/5 rounded-2xl">닫기</button>
+    const modal = document.getElementById('card-modal');
+    const content = document.getElementById('modal-content');
+
+    if (!modal || !content) {
+        console.error('모달 요소를 찾을 수 없습니다. HTML을 확인해주세요.');
+        return;
+    }
+
+    const imgSrc = `${IMAGE_BASE}${card.id}.jpg`;
+
+    content.innerHTML = `
+        <div class="relative h-96">
+            <img src="${imgSrc}" class="w-full h-full object-cover object-top" onerror="this.src='https://picsum.photos/id/29/300/380'">
+            <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent"></div>
+            <div class="absolute top-4 right-4">
+                <span class="px-3 py-1 text-sm font-bold bg-black/60 rounded-full border border-white/20">${card.grade}</span>
+            </div>
+            <div class="absolute bottom-4 left-4 right-4">
+                <div class="text-3xl font-black">${card.name}</div>
+                <div class="text-white/70 text-sm">${card.age}세 • ${card.gender} • ${card.region}</div>
+            </div>
+        </div>
+        <div class="p-5">
+            <div class="grid grid-cols-2 gap-4 text-sm mb-5">
+                <div>
+                    <div class="text-xs text-zinc-400">CLASS</div>
+                    <div class="font-bold text-lg">${card.class || '-'}</div>
                 </div>
-            `;
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
+                <div>
+                    <div class="text-xs text-zinc-400">ATTRIBUTE</div>
+                    <div class="font-bold text-lg text-emerald-400">${card.attribute || '-'}</div>
+                </div>
+            </div>
+            <button onclick="hideCardModal()" class="w-full py-3 border border-white/30 hover:bg-white/5 rounded-2xl">닫기</button>
+        </div>
+    `;
 
-        function hideCardModal() {
-            const m = document.getElementById('card-modal');
-            m.classList.add('hidden');
-            m.classList.remove('flex');
-        }
-
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
         function restartGame() {
             location.reload();
         }
@@ -725,5 +727,11 @@ function renderBattleLog() {
         }
         window.onload = init;
     </script>
+    <!-- Card Modal -->
+<div id="card-modal" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4" onclick="if(event.target.id==='card-modal')hideCardModal()">
+    <div class="bg-zinc-900 border border-zinc-700 rounded-3xl max-w-md w-full overflow-hidden" onclick="event.stopPropagation()">
+        <div id="modal-content"></div>
+    </div>
+</div>
 </body>
 </html>
