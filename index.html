@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VR BATTLE MASTERS</title>
-    <!-- Favicon -->
-<link rel="icon" href="favicon.png" type="image/png">
-<link rel="apple-touch-icon" href="favicon.png">
-<link rel="shortcut icon" href="favicon.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -30,15 +26,6 @@
             background-size: 18px 18px;
             pointer-events: none;
         }
-        <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-NP3VPPBRKL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-NP3VPPBRKL');
-</script>
     </style>
 </head>
 <body class="bg-zinc-950 text-white game-bg min-h-screen">
@@ -64,8 +51,18 @@
     <div id="main-screen" class="section active min-h-[calc(100vh-60px)] flex items-center justify-center">
         <div class="text-center px-6 max-w-3xl mx-auto">
             <div class="mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-600 to-red-800 rounded-2xl mb-5 shadow-lg">
-                    <i class="fa-solid fa-fist-raised text-3xl"></i>
+                <!-- Main Trailer Video -->
+                <div class="mb-6 rounded-2xl overflow-hidden border border-zinc-700 shadow-2xl max-w-lg mx-auto">
+                    <video 
+                        id="main-video"
+                        autoplay 
+                        muted 
+                        loop 
+                        playsinline
+                        class="w-full aspect-video object-cover bg-black">
+                        <source src="https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bm_main.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
                 </div>
                 <h1 class="title-font text-7xl md:text-8xl leading-none tracking-tight">
                     <span class="bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">VIOLENCE</span><br>
@@ -232,10 +229,10 @@
         </div>
 
         <div class="text-center">
-    <button
-  onclick="location.reload();"
-  class="mt-12 px-12 py-5 bg-white text-black font-bold text-xl rounded-3xl">
-  다시 시작하기
+          <button 
+  onclick="window.open('https://www.effectivecpmnetwork.com/vr703bycg?key=278a57af0aafd0ac66d576a9e974092d', '_blank'); restartGame();" 
+  class="px-10 py-4 bg-white text-black font-bold rounded-2xl">
+  메인으로 돌아가기
 </button>
         </div>
     </div>
@@ -261,21 +258,36 @@
 
         function parseCSV(text) {
             const lines = text.trim().split('\n');
-            const headers = lines[0].split(',');
+            const headers = lines[0].split(',').map(h => h.trim());
             return lines.slice(1).map(line => {
                 const vals = line.split(',');
                 const obj = {};
-                headers.forEach((h, i) => obj[h.trim()] = vals[i] ? vals[i].trim() : '');
+                headers.forEach((h, i) => obj[h] = vals[i] ? vals[i].trim() : '');
+                // Case-insensitive getter
+                const get = (key) => {
+                    if (obj[key] !== undefined) return obj[key];
+                    const lower = key.toLowerCase();
+                    if (obj[lower] !== undefined) return obj[lower];
+                    const upper = key.toUpperCase();
+                    if (obj[upper] !== undefined) return obj[upper];
+                    return '';
+                };
                 return {
-                    id: obj.id,
-                    name: obj.name,
-                    gender: obj.gender,
-                    age: parseInt(obj.age) || 0,
-                    region: obj.region,
-                    grade: obj.grade,
-                    class: obj.class,
-                    attribute: obj.attribute,
-                    power: parseInt(obj.power) || 0
+                    id: get('id'),
+                    name: get('name'),
+                    gender: get('gender'),
+                    age: parseInt(get('age')) || 0,
+                    region: get('region'),
+                    grade: get('grade'),
+                    class: get('class'),
+                    attribute: get('attribute'),
+                    power: parseInt(get('power')) || 0,
+                    hp: parseInt(get('HP') || get('hp')) || 0,
+                    atk: parseInt(get('ATK') || get('atk')) || 0,
+                    def: parseInt(get('DEF') || get('def')) || 0,
+                    phy: parseInt(get('PHY') || get('phy')) || 0,
+                    men: parseInt(get('MEN') || get('men')) || 0,
+                    mor: parseInt(get('MOR') || get('mor')) || 0
                 };
             });
         }
@@ -683,7 +695,7 @@ function renderBattleLog() {
     });
 }
 
-        // 상세 모달 - POWER 숨김 + 사진/정보 노출
+        // 상세 모달 - POWER 숨김 + HP/ATK/DEF/PHY/MEN/MOR 노출
         function showCardModal(card) {
     if (!card) return;
 
@@ -698,7 +710,7 @@ function renderBattleLog() {
     const imgSrc = `${IMAGE_BASE}${card.id}.jpg`;
 
     content.innerHTML = `
-        <div class="relative h-96">
+        <div class="relative h-80">
             <img src="${imgSrc}" class="w-full h-full object-cover object-top" onerror="this.src='https://picsum.photos/id/29/300/380'">
             <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent"></div>
             <div class="absolute top-4 right-4">
@@ -710,7 +722,7 @@ function renderBattleLog() {
             </div>
         </div>
         <div class="p-5">
-            <div class="grid grid-cols-2 gap-4 text-sm mb-5">
+            <div class="grid grid-cols-2 gap-4 text-sm mb-4">
                 <div>
                     <div class="text-xs text-zinc-400">CLASS</div>
                     <div class="font-bold text-lg">${card.class || '-'}</div>
@@ -720,8 +732,35 @@ function renderBattleLog() {
                     <div class="font-bold text-lg text-emerald-400">${card.attribute || '-'}</div>
                 </div>
             </div>
-<button onclick="hideCardModal()" class="w-full py-3 border border-white/30 hover:bg-white/5 rounded-2xl">닫기</button>
-</div>
+            <!-- Stats Profile (HP / ATK / DEF / PHY / MEN / MOR) - POWER hidden -->
+            <div class="grid grid-cols-3 gap-2 mb-5">
+                <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
+                    <div class="text-[10px] text-zinc-400 tracking-wider">HP</div>
+                    <div class="font-bold text-lg text-red-400">${card.hp || 0}</div>
+                </div>
+                <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
+                    <div class="text-[10px] text-zinc-400 tracking-wider">ATK</div>
+                    <div class="font-bold text-lg text-orange-400">${card.atk || 0}</div>
+                </div>
+                <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
+                    <div class="text-[10px] text-zinc-400 tracking-wider">DEF</div>
+                    <div class="font-bold text-lg text-blue-400">${card.def || 0}</div>
+                </div>
+                <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
+                    <div class="text-[10px] text-zinc-400 tracking-wider">PHY</div>
+                    <div class="font-bold text-lg text-emerald-400">${card.phy || 0}</div>
+                </div>
+                <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
+                    <div class="text-[10px] text-zinc-400 tracking-wider">MEN</div>
+                    <div class="font-bold text-lg text-violet-400">${card.men || 0}</div>
+                </div>
+                <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
+                    <div class="text-[10px] text-zinc-400 tracking-wider">MOR</div>
+                    <div class="font-bold text-lg text-amber-400">${card.mor || 0}</div>
+                </div>
+            </div>
+            <button onclick="hideCardModal()" class="w-full py-3 border border-white/30 hover:bg-white/5 rounded-2xl">닫기</button>
+        </div>
     `;
 
     modal.classList.remove('hidden');
@@ -755,5 +794,6 @@ function renderBattleLog() {
         <div id="modal-content"></div>
     </div>
 </div>
+<script src="https://pl30480258.effectivecpmnetwork.com/93/d1/55/93d155461619eded1492ce491327e7c2.js"></script>
 </body>
 </html>
