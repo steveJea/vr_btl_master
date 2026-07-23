@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VR BATTLE MASTERS</title>
+    <!-- Favicon -->
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="favicon.png">
+<link rel="shortcut icon" href="favicon.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -26,6 +30,15 @@
             background-size: 18px 18px;
             pointer-events: none;
         }
+        <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NP3VPPBRKL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-NP3VPPBRKL');
+</script>
     </style>
 </head>
 <body class="bg-zinc-950 text-white game-bg min-h-screen">
@@ -219,10 +232,10 @@
         </div>
 
         <div class="text-center">
-          <button 
-  onclick="window.open('https://www.effectivecpmnetwork.com/vr703bycg?key=278a57af0aafd0ac66d576a9e974092d', '_blank'); restartGame();" 
-  class="px-10 py-4 bg-white text-black font-bold rounded-2xl">
-  메인으로 돌아가기
+    <button
+  onclick="location.reload();"
+  class="mt-12 px-12 py-5 bg-white text-black font-bold text-xl rounded-3xl">
+  다시 시작하기
 </button>
         </div>
     </div>
@@ -742,6 +755,5 @@ function renderBattleLog() {
         <div id="modal-content"></div>
     </div>
 </div>
-<script src="https://pl30480258.effectivecpmnetwork.com/93/d1/55/93d155461619eded1492ce491327e7c2.js"></script>
 </body>
 </html>
