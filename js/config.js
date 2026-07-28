@@ -16,3 +16,12 @@ export const MODE_DISTRIBUTION = {
   10: { "NORMAL": 5, "RARE": 2, "HIGH RARE": 1, "SUPER RARE": 1, "ULTRA RARE": 1, "MYTHIC RARE": 0 },
   20: { "NORMAL": 10, "RARE": 4, "HIGH RARE": 2, "SUPER RARE": 2, "ULTRA RARE": 1, "MYTHIC RARE": 1 }
 };
+
+export const MAIN_BG_IMAGE = 'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/img/main.jpg';
+
+export const BGM = {
+  main:    'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bgm/Battle%20Master.mp3',
+  select:  'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bgm/Where%20is%20my%20Hero.mp3',
+  battle:  'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bgm/Battle%20yourself.mp3',
+  result:  'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bgm/Who%20is%20the%20winner.mp3'
+};
