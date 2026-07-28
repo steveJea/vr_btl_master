@@ -13,6 +13,16 @@ body {
   background: linear-gradient(180deg, #0a0a0a 0%, #1a0f0f 50%, #0a0a0a 100%);
 }
 
+/* 메인 화면 배경 이미지 */
+#main-screen {
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.72), rgba(10, 5, 5, 0.85)),
+    url('https://raw.githubusercontent.com/steveJea/vr_btl_master/main/img/main.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 .section {
   display: none !important;
 }
@@ -45,4 +55,12 @@ body {
               linear-gradient(-45deg, transparent 58%, rgba(239,68,68,0.4) 58%, rgba(239,68,68,0.4) 60%, transparent 60%);
   background-size: 18px 18px;
   pointer-events: none;
+}
+
+/* 음소거 버튼 스타일 */
+#mute-btn {
+  transition: all 0.2s ease;
+}
+#mute-btn.muted {
+  color: #71717a;
 }

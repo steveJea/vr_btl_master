@@ -41,9 +41,14 @@
           <div class="text-[10px] text-red-500 -mt-1 tracking-widest">THE BRUTAL CITY</div>
         </div>
       </div>
-      <button onclick="restartGame()" class="text-sm px-4 py-1.5 hover:bg-zinc-800 rounded-lg flex items-center gap-2">
-        <i class="fa-solid fa-home text-red-500"></i> HOME
-      </button>
+      <div class="flex items-center gap-2">
+        <button id="mute-btn" onclick="toggleMuteBtn()" class="text-sm px-3 py-1.5 hover:bg-zinc-800 rounded-lg" title="음소거">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+        <button onclick="restartGame()" class="text-sm px-4 py-1.5 hover:bg-zinc-800 rounded-lg flex items-center gap-2">
+          <i class="fa-solid fa-home text-red-500"></i> HOME
+        </button>
+      </div>
     </div>
   </div>
 

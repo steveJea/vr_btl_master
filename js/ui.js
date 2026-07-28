@@ -2,6 +2,7 @@ import { IMAGE_BASE } from './config.js';
 import { gameState } from './state.js';
 import { createCardElement } from './cards.js';
 import { getGradeBorder } from './utils.js';
+import { playBGM } from './audio.js';
 
 export function showScreen(id) {
   document.querySelectorAll('.section').forEach(s => {
@@ -12,6 +13,23 @@ export function showScreen(id) {
   if (t) {
     t.classList.add('active');
     t.style.setProperty('display', 'block', 'important');
+  }
+
+  // 화면별 배경음 전환
+  switch (id) {
+    case 'main-screen':
+      playBGM('main');
+      break;
+    case 'choice-screen':
+    case 'deck-screen':
+      playBGM('select');
+      break;
+    case 'battle-screen':
+      playBGM('battle');
+      break;
+    case 'result-screen':
+      playBGM('result');
+      break;
   }
 }
 

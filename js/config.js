@@ -2,6 +2,17 @@ export const IMAGE_BASE = 'https://raw.githubusercontent.com/steveJea/vr-ideal-w
 export const CSV_URL = 'https://raw.githubusercontent.com/steveJea/vr-ideal-worldcup/main/VR_DATA.csv';
 export const VIDEO_URL = 'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bm_main.mp4';
 
+// 배경 이미지
+export const MAIN_BG_IMAGE = 'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/img/main.jpg';
+
+// 배경음 (화면별)
+export const BGM = {
+  main:    'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bgm/Battle%20Master.mp3',
+  select:  'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bgm/Where%20is%20my%20Hero.mp3',  // 전투방식 + 카드선택
+  battle:  'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bgm/Battle%20yourself.mp3',
+  result:  'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bgm/Who%20is%20the%20winner.mp3'
+};
+
 export const GRADE_COLORS = {
   "NORMAL": "slate",
   "RARE": "blue",
