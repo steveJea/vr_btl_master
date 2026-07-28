@@ -298,4 +298,13 @@ export function finishGame() {
 
   document.getElementById('final-score').innerText = `${gameState.wins} WINS — ${gameState.loses} LOSES`;
   renderBattleLog();
+
+  // 화면별 배경음 전환
+switch (id) {
+  case 'main-screen':   playBGM('main'); break;
+  case 'choice-screen':
+  case 'deck-screen':   playBGM('select'); break;
+  case 'battle-screen': playBGM('battle'); break;
+  case 'result-screen': playBGM('result'); break;
+}
 }
