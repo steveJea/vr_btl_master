@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VR BATTLE MASTERS</title>
+  
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="./css/style.css">
+  
+  <title>VR Shooting Masters | 슈팅 액션을 즐겨보세요</title>
+  <meta name="description" content="VR Shooting Masters - Violance Royale 시리즈의 슈팅 액션 게임. PC에서 박진감 넘치는 슈팅을 경험하세요.">
+  <meta name="keywords" content="VR Shooting Masters, 슈팅 게임, Violance Royale, 웹 슈팅, PC 게임">
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NP3VPPBRKL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-NP3VPPBRKL');
+  </script>
+</head>
+<body class="bg-zinc-950 text-white game-bg min-h-screen">
+
+  <!-- Header -->
+  <div class="border-b border-zinc-800 bg-black/70 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-red-600 rounded-lg flex items-center justify-center">
+          <i class="fa-solid fa-skull"></i>
+        </div>
+        <div>
+          <div class="title-font text-xl tracking-wider">VIOLENCE ROYALE</div>
+          <div class="text-[10px] text-red-500 -mt-1 tracking-widest">THE BRUTAL CITY</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="mute-btn" onclick="toggleMuteBtn()" class="text-sm px-3 py-1.5 hover:bg-zinc-800 rounded-lg" title="음소거">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+        <button onclick="restartGame()" class="text-sm px-4 py-1.5 hover:bg-zinc-800 rounded-lg flex items-center gap-2">
+          <i class="fa-solid fa-home text-red-500"></i> HOME
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN SCREEN -->
+  <div id="main-screen" class="section active min-h-[calc(100vh-60px)] flex items-center justify-center">
+    <div class="text-center px-6 max-w-3xl mx-auto">
+      <div class="mb-8">
+        <div class="mb-6 rounded-2xl overflow-hidden border border-zinc-700 shadow-2xl max-w-lg mx-auto">
+          <video 
+            id="main-video"
+            autoplay 
+            muted 
+            loop 
+            playsinline
+            class="w-full aspect-video object-cover bg-black">
+            <source src="https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bm_main.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <h1 class="title-font text-7xl md:text-8xl leading-none tracking-tight">
+          <span class="bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">VIOLENCE</span><br>
+          <span>ROYALE</span>
+        </h1>
+        <div class="text-red-500 text-2xl tracking-[6px] font-bold mt-1">THE BRUTAL CITY</div>
+        <div class="text-4xl title-font tracking-widest mt-1 text-white/90">BATTLE MASTERS</div>
+      </div>
+      <p class="text-zinc-400 mb-10">카드의 힘으로 잔혹한 도시를 지배하라.<br>POWER가 모든 것을 결정한다.</p>
+      <button onclick="startGame()" class="px-14 py-4 bg-red-600 hover:bg-red-500 text-xl font-bold rounded-2xl shadow-xl">
+        PRESS ANY KEY TO START
+      </button>
+    </div>
+  </div>
+
+  <!-- CHOICE SCREEN -->
+  <div id="choice-screen" class="section min-h-[calc(100vh-60px)] flex items-center justify-center py-12">
+    <div class="max-w-5xl w-full px-6 mx-auto">
+      <div class="text-center mb-10">
+        <div class="text-red-500 text-sm tracking-[3px] font-bold mb-1">SELECT GAME MODE</div>
+        <h2 class="title-font text-5xl md:text-6xl">게임 방식을 선택하세요</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div onclick="selectGameMode(5)" class="cursor-pointer bg-zinc-900 border border-zinc-700 hover:border-red-500 rounded-3xl p-7 transition">
+          <div class="text-6xl font-black title-font">5 VS 5</div>
+          <div class="mt-5 text-sm space-y-2 text-zinc-300">
+            <div class="flex justify-between"><span>NORMAL</span><span class="font-mono">2</span></div>
+            <div class="flex justify-between"><span>RARE</span><span class="font-mono">1</span></div>
+            <div class="flex justify-between"><span>HIGH RARE</span><span class="font-mono">1</span></div>
+            <div class="flex justify-between"><span>ULTRA RARE</span><span class="font-mono">1</span></div>
+          </div>
+        </div>
+        <div onclick="selectGameMode(10)" class="cursor-pointer bg-zinc-900 border border-zinc-700 hover:border-red-500 rounded-3xl p-7 transition relative">
+          <div class="absolute -top-2 -right-2 bg-red-600 text-xs px-3 py-0.5 rounded font-bold">RECOMMENDED</div>
+          <div class="text-6xl font-black title-font">10 VS 10</div>
+          <div class="mt-5 text-sm space-y-2 text-zinc-300">
+            <div class="flex justify-between"><span>NORMAL</span><span class="font-mono">5</span></div>
+            <div class="flex justify-between"><span>RARE</span><span class="font-mono">2</span></div>
+            <div class="flex justify-between"><span>HIGH RARE</span><span class="font-mono">1</span></div>
+            <div class="flex justify-between"><span>SUPER RARE</span><span class="font-mono">1</span></div>
+            <div class="flex justify-between"><span>ULTRA RARE</span><span class="font-mono">1</span></div>
+          </div>
+        </div>
+        <div onclick="selectGameMode(20)" class="cursor-pointer bg-zinc-900 border border-zinc-700 hover:border-red-500 rounded-3xl p-7 transition">
+          <div class="text-6xl font-black title-font">20 VS 20</div>
+          <div class="mt-5 text-sm space-y-2 text-zinc-300">
+            <div class="flex justify-between"><span>NORMAL</span><span class="font-mono">10</span></div>
+            <div class="flex justify-between"><span>RARE</span><span class="font-mono">4</span></div>
+            <div class="flex justify-between"><span>HIGH RARE</span><span class="font-mono">2</span></div>
+            <div class="flex justify-between"><span>SUPER RARE</span><span class="font-mono">2</span></div>
+            <div class="flex justify-between"><span>ULTRA RARE</span><span class="font-mono">1</span></div>
+            <div class="flex justify-between"><span class="text-red-400">MYTHIC RARE</span><span class="font-mono">1</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DECK SCREEN -->
+  <div id="deck-screen" class="section py-8">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+        <div>
+          <span class="px-4 py-1 bg-red-600 text-xs font-bold tracking-widest rounded">DECK PREPARATION</span>
+          <span id="mode-badge" class="text-2xl font-bold ml-3"></span>
+        </div>
+        <div class="flex gap-3">
+          <button onclick="changeDeck()" id="change-btn" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded-xl text-sm font-semibold disabled:opacity-40">
+            덱 변경 <span id="change-count">3/3</span>
+          </button>
+          <button onclick="confirmDeck()" class="px-7 py-2.5 bg-red-600 hover:bg-red-500 rounded-xl font-bold">
+            덱 확인 및 배틀 시작
+          </button>
+        </div>
+      </div>
+      <div id="deck-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
+    </div>
+  </div>
+
+  <!-- BATTLE SCREEN -->
+  <div id="battle-screen" class="section py-6">
+    <div class="max-w-6xl mx-auto px-5">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <div>
+          <div class="text-xs text-red-500 font-bold tracking-wider">BATTLE IN PROGRESS</div>
+          <div id="battle-progress" class="text-3xl font-black title-font">01 / 05</div>
+        </div>
+        <div class="flex gap-6 bg-zinc-900 border border-zinc-700 px-5 py-2 rounded-2xl text-sm">
+          <div><span class="text-emerald-400 font-bold">WIN</span> <span id="win-count" class="font-mono text-2xl font-bold ml-1">0</span></div>
+          <div><span class="text-red-400 font-bold">LOSE</span> <span id="lose-count" class="font-mono text-2xl font-bold ml-1">0</span></div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="flex items-center gap-2 text-red-400 text-sm mb-1">
+          <i class="fa-solid fa-user-secret"></i>
+          <span class="font-bold">OPPONENT</span>
+        </div>
+        <div class="flex gap-2 items-end">
+          <div id="opp-used" class="flex gap-1.5 flex-wrap min-h-[52px] pr-3 border-r border-zinc-700"></div>
+          <div id="opp-remaining" class="flex gap-1.5 overflow-x-auto flex-1"></div>
+        </div>
+      </div>
+
+      <div id="vs-zone" class="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 mb-4 min-h-[300px] flex items-center justify-center">
+        <div id="vs-idle" class="text-center">
+          <div class="w-14 h-14 bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-zinc-600">
+            <i class="fa-solid fa-question text-3xl text-zinc-500"></i>
+          </div>
+          <p class="text-zinc-400">아래에서 카드를 선택하여 배틀을 시작하세요</p>
+        </div>
+        <div id="vs-countdown" class="hidden text-center">
+          <div id="countdown-num" class="text-8xl font-black title-font text-red-500">3</div>
+        </div>
+        <div id="vs-battle" class="hidden w-full">
+          <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10">
+            <div class="w-48">
+              <div class="text-emerald-400 text-xs font-bold mb-1 text-center">YOUR CARD</div>
+              <div id="vs-my-card" class="rounded-2xl overflow-hidden border-2 border-emerald-500"></div>
+            </div>
+            <div class="text-5xl font-black title-font text-white/60">VS</div>
+            <div class="w-48">
+              <div class="text-red-400 text-xs font-bold mb-1 text-center">OPPONENT</div>
+              <div id="vs-opp-card" class="rounded-2xl overflow-hidden border-2 border-red-500"></div>
+            </div>
+          </div>
+          <div id="battle-result-stamp" class="hidden text-center mt-6">
+            <div id="result-text" class="text-5xl font-black tracking-widest"></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex justify-between items-center mb-2">
+          <span class="font-bold text-emerald-400">YOUR HAND</span>
+          <span id="hand-count" class="text-xs text-emerald-300/70"></span>
+        </div>
+        <div id="my-hand" class="flex gap-3 overflow-x-auto pb-3"></div>
+      </div>
+
+      <div class="mt-4">
+        <div class="text-xs text-zinc-500 mb-1">USED CARDS (ME)</div>
+        <div id="my-used" class="flex gap-1.5 flex-wrap min-h-[48px]"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="result-screen" class="section py-10">
+    <div class="max-w-4xl mx-auto px-6">
+      <div class="text-center mb-8">
+        <div id="final-result-text" class="text-6xl md:text-7xl font-black title-font mb-2"></div>
+        <div id="final-score" class="text-2xl font-mono text-zinc-300"></div>
+      </div>
+
+      <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 mb-8">
+        <div class="font-bold text-lg mb-4 px-1">배틀 기록</div>
+        <div id="battle-log" class="space-y-3"></div>
+      </div>
+
+      <div class="text-center">
+        <button onclick="location.reload();" class="px-10 py-4 bg-white text-black font-bold rounded-2xl">
+          메인으로 돌아가기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Modal -->
+  <div id="card-modal" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4" onclick="if(event.target.id==='card-modal')hideCardModal()">
+    <div class="bg-zinc-900 border border-zinc-700 rounded-3xl max-w-md w-full overflow-hidden" onclick="event.stopPropagation()">
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="
+    width: 100%;
+    padding: 16px 0;
+    text-align: center;
+    background: #111;
+    color: #888;
+    font-size: 13px;
+    font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+    border-top: 1px solid #333;
+  ">
+    <div>
+      Copyright © 2026 
+      <a href="https://mbbs.kr" target="_blank" style="color:#aaa; text-decoration:none;">
+        MBBS Inc.
+      </a>
+      All Rights Reserved.
+    </div>
+  </footer>
+
+  <!-- Main Module -->
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
