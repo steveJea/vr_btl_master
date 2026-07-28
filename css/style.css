@@ -46,3 +46,12 @@ body {
   background-size: 18px 18px;
   pointer-events: none;
 }
+
+#main-screen {
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.72), rgba(10, 5, 5, 0.85)),
+    url('https://raw.githubusercontent.com/steveJea/vr_btl_master/main/img/main.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
