@@ -1,7 +1,7 @@
 import { IMAGE_BASE } from './config.js';
 import { gameState } from './state.js';
 import { createCardElement } from './cards.js';
-import { getGradeBorder } from './utils.js';
+import { getGradeBorder, fmtNum } from './utils.js';
 import { playBGM } from './audio.js';
 
 export function showScreen(id) {
@@ -64,10 +64,10 @@ export function updateBattleUI() {
   const rem = gameState.remainingPlayer.length;
   document.getElementById('battle-progress').innerText =
     `${String(gameState.mode - rem + 1).padStart(2, '0')} / ${gameState.mode}`;
-  document.getElementById('win-count').innerText = gameState.wins;
-  document.getElementById('lose-count').innerText = gameState.loses;
+  document.getElementById('win-count').innerText = fmtNum(gameState.wins);
+  document.getElementById('lose-count').innerText = fmtNum(gameState.loses);
   const drawEl = document.getElementById('draw-count');
-  if (drawEl) drawEl.innerText = gameState.draws;
+  if (drawEl) drawEl.innerText = fmtNum(gameState.draws);
   document.getElementById('hand-count').innerText = `${rem} cards left`;
 }
 
@@ -194,7 +194,7 @@ export function showCardModal(card) {
     <div class="p-5">
       <div class="mb-4 flex items-baseline justify-between bg-zinc-800/80 rounded-xl px-4 py-2.5 border border-amber-400/40">
         <span class="text-xs text-zinc-400 tracking-wider">POWER</span>
-        <span class="card-power font-black text-2xl text-amber-400">${card.power}</span>
+        <span class="card-power font-black text-2xl text-amber-400">${fmtNum(card.power)}</span>
       </div>
       <div class="grid grid-cols-2 gap-4 text-sm mb-4">
         <div>
@@ -209,27 +209,27 @@ export function showCardModal(card) {
       <div class="grid grid-cols-3 gap-2 mb-5">
         <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
           <div class="text-[10px] text-zinc-400 tracking-wider">HP</div>
-          <div class="font-bold text-lg text-red-400">${card.hp || 0}</div>
+          <div class="font-bold text-lg text-red-400">${fmtNum(card.hp || 0)}</div>
         </div>
         <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
           <div class="text-[10px] text-zinc-400 tracking-wider">ATK</div>
-          <div class="font-bold text-lg text-orange-400">${card.atk || 0}</div>
+          <div class="font-bold text-lg text-orange-400">${fmtNum(card.atk || 0)}</div>
         </div>
         <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
           <div class="text-[10px] text-zinc-400 tracking-wider">DEF</div>
-          <div class="font-bold text-lg text-blue-400">${card.def || 0}</div>
+          <div class="font-bold text-lg text-blue-400">${fmtNum(card.def || 0)}</div>
         </div>
         <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
           <div class="text-[10px] text-zinc-400 tracking-wider">PHY</div>
-          <div class="font-bold text-lg text-emerald-400">${card.phy || 0}</div>
+          <div class="font-bold text-lg text-emerald-400">${fmtNum(card.phy || 0)}</div>
         </div>
         <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
           <div class="text-[10px] text-zinc-400 tracking-wider">MEN</div>
-          <div class="font-bold text-lg text-violet-400">${card.men || 0}</div>
+          <div class="font-bold text-lg text-violet-400">${fmtNum(card.men || 0)}</div>
         </div>
         <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
           <div class="text-[10px] text-zinc-400 tracking-wider">MOR</div>
-          <div class="font-bold text-lg text-amber-400">${card.mor || 0}</div>
+          <div class="font-bold text-lg text-amber-400">${fmtNum(card.mor || 0)}</div>
         </div>
       </div>
       <button onclick="window.hideCardModal()" class="w-full py-3 border border-white/30 hover:bg-white/5 rounded-2xl">닫기</button>
@@ -287,7 +287,7 @@ export function renderBattleLog() {
       <div class="my-card-slot"></div>
       <div class="flex-1 min-w-0">
         <div class="font-bold text-sm truncate">${log.myCard.name}</div>
-        <div class="text-xs text-zinc-400">${log.myCard.grade}</div>
+        <div class="text-xs text-zinc-400">${log.myCard.grade} · <span class="text-amber-400">⚡ ${fmtNum(log.myCard.power)}</span></div>
       </div>
       <div class="px-3 text-center">
         <div class="text-xs font-black ${log.draw ? 'text-amber-400' : log.win ? 'text-emerald-400' : 'text-red-400'}">
@@ -296,7 +296,7 @@ export function renderBattleLog() {
       </div>
       <div class="flex-1 min-w-0 text-right">
         <div class="font-bold text-sm truncate">${log.oppCard.name}</div>
-        <div class="text-xs text-zinc-400">${log.oppCard.grade}</div>
+        <div class="text-xs text-zinc-400"><span class="text-amber-400">⚡ ${fmtNum(log.oppCard.power)}</span> · ${log.oppCard.grade}</div>
       </div>
       <div class="opp-card-slot"></div>
     `;
@@ -322,6 +322,6 @@ export function finishGame() {
     finalText.innerHTML = `CITY <span class="text-red-500">DEFEAT</span>`;
   }
 
-  document.getElementById('final-score').innerText = `${gameState.wins} WINS — ${gameState.loses} LOSES — ${gameState.draws} DRAWS`;
+  document.getElementById('final-score').innerText = `${fmtNum(gameState.wins)} WINS — ${fmtNum(gameState.loses)} LOSES — ${fmtNum(gameState.draws)} DRAWS`;
   renderBattleLog();
 }
