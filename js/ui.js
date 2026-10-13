@@ -190,6 +190,10 @@ export function showCardModal(card) {
       </div>
     </div>
     <div class="p-5">
+      <div class="mb-4 flex items-baseline justify-between bg-zinc-800/80 rounded-xl px-4 py-2.5 border border-amber-400/40">
+        <span class="text-xs text-zinc-400 tracking-wider">POWER</span>
+        <span class="card-power font-black text-2xl text-amber-400">${card.power}</span>
+      </div>
       <div class="grid grid-cols-2 gap-4 text-sm mb-4">
         <div>
           <div class="text-xs text-zinc-400">CLASS</div>

@@ -32,7 +32,7 @@ function parseCSV(text) {
       grade: get('grade'),
       class: get('class'),
       attribute: get('attribute'),
-      power: parseInt(get('power')) || 0,
+      power: Math.trunc(parseFloat(get('power'))) || 0, // CSV power, 소수점 버림
       hp: parseInt(get('HP') || get('hp')) || 0,
       atk: parseInt(get('ATK') || get('atk')) || 0,
       def: parseInt(get('DEF') || get('def')) || 0,

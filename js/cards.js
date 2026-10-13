@@ -44,6 +44,7 @@ export function createCardElement(card, onClick = null) {
     <div class="p-3">
       <div class="font-bold text-lg leading-tight">${card.name}</div>
       <div class="text-xs text-zinc-400 mt-0.5">${card.age}세 • ${card.region}</div>
+      <div class="card-power text-sm font-black text-amber-400 mt-1">⚡ ${card.power}</div>
     </div>
   `;
 
@@ -63,6 +64,7 @@ export function renderVsCard(containerId, card) {
       <div class="p-3 bg-zinc-900">
         <div class="font-bold text-lg">${card.name}</div>
         <div class="text-xs text-zinc-400 mt-0.5">${card.class} • ${card.region}</div>
+        <div class="card-power text-base font-black text-amber-400 mt-1">⚡ POWER ${card.power}</div>
       </div>
     </div>
   `;
