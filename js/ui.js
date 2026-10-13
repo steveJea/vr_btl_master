@@ -66,6 +66,8 @@ export function updateBattleUI() {
     `${String(gameState.mode - rem + 1).padStart(2, '0')} / ${gameState.mode}`;
   document.getElementById('win-count').innerText = gameState.wins;
   document.getElementById('lose-count').innerText = gameState.loses;
+  const drawEl = document.getElementById('draw-count');
+  if (drawEl) drawEl.innerText = gameState.draws;
   document.getElementById('hand-count').innerText = `${rem} cards left`;
 }
 
@@ -146,7 +148,7 @@ export function renderUsedCards() {
   oppUsed.innerHTML = '';
   gameState.usedOpp.slice(0, 6).forEach(u => {
     const d = document.createElement('div');
-    d.className = `w-10 h-12 rounded-lg overflow-hidden border cursor-pointer ${u.win ? 'border-emerald-400' : 'border-red-600'}`;
+    d.className = `w-10 h-12 rounded-lg overflow-hidden border cursor-pointer ${u.draw ? 'border-amber-400' : u.win ? 'border-emerald-400' : 'border-red-600'}`;
     d.style.background = `url('${IMAGE_BASE}${u.id}.jpg') center/cover`;
     d.onclick = () => showCardModal(u);
     oppUsed.appendChild(d);
@@ -157,7 +159,7 @@ export function renderUsedCards() {
   myUsed.innerHTML = '';
   gameState.usedPlayer.slice(0, 8).forEach(u => {
     const d = document.createElement('div');
-    d.className = `w-10 h-12 rounded-lg overflow-hidden border cursor-pointer ${u.win ? 'border-emerald-400' : 'border-red-600'}`;
+    d.className = `w-10 h-12 rounded-lg overflow-hidden border cursor-pointer ${u.draw ? 'border-amber-400' : u.win ? 'border-emerald-400' : 'border-red-600'}`;
     d.style.background = `url('${IMAGE_BASE}${u.id}.jpg') center/cover`;
     d.onclick = () => showCardModal(u);
     myUsed.appendChild(d);
@@ -190,6 +192,10 @@ export function showCardModal(card) {
       </div>
     </div>
     <div class="p-5">
+      <div class="mb-4 flex items-baseline justify-between bg-zinc-800/80 rounded-xl px-4 py-2.5 border border-amber-400/40">
+        <span class="text-xs text-zinc-400 tracking-wider">POWER</span>
+        <span class="card-power font-black text-2xl text-amber-400">${card.power}</span>
+      </div>
       <div class="grid grid-cols-2 gap-4 text-sm mb-4">
         <div>
           <div class="text-xs text-zinc-400">CLASS</div>
@@ -259,8 +265,8 @@ export function renderBattleLog() {
     const el = document.createElement('div');
     el.className = `bg-zinc-950 border border-zinc-700 rounded-2xl p-3 flex items-center gap-3 hover:border-zinc-500 transition`;
 
-    const myWinClass = log.win ? 'border-emerald-500' : 'border-red-600';
-    const oppWinClass = log.win ? 'border-red-600' : 'border-emerald-500';
+    const myWinClass = log.draw ? 'border-amber-400' : log.win ? 'border-emerald-500' : 'border-red-600';
+    const oppWinClass = log.draw ? 'border-amber-400' : log.win ? 'border-red-600' : 'border-emerald-500';
 
     const myCardImg = document.createElement('div');
     myCardImg.className = `w-14 h-14 rounded-xl overflow-hidden border-2 ${myWinClass} flex-shrink-0 cursor-pointer`;
@@ -284,8 +290,8 @@ export function renderBattleLog() {
         <div class="text-xs text-zinc-400">${log.myCard.grade}</div>
       </div>
       <div class="px-3 text-center">
-        <div class="text-xs font-black ${log.win ? 'text-emerald-400' : 'text-red-400'}">
-          ${log.win ? 'WIN' : 'LOSE'}
+        <div class="text-xs font-black ${log.draw ? 'text-amber-400' : log.win ? 'text-emerald-400' : 'text-red-400'}">
+          ${log.draw ? '무승부' : log.win ? 'WIN' : 'LOSE'}
         </div>
       </div>
       <div class="flex-1 min-w-0 text-right">
@@ -308,12 +314,14 @@ export function finishGame() {
   const isWin = gameState.wins > gameState.loses;
   const finalText = document.getElementById('final-result-text');
 
-  if (isWin) {
+  if (gameState.wins === gameState.loses) {
+    finalText.innerHTML = `<span class="text-amber-400">DRAW</span> 무승부`;
+  } else if (isWin) {
     finalText.innerHTML = `YOUR <span class="text-emerald-400">VICTORY</span>`;
   } else {
     finalText.innerHTML = `CITY <span class="text-red-500">DEFEAT</span>`;
   }
 
-  document.getElementById('final-score').innerText = `${gameState.wins} WINS — ${gameState.loses} LOSES`;
+  document.getElementById('final-score').innerText = `${gameState.wins} WINS — ${gameState.loses} LOSES — ${gameState.draws} DRAWS`;
   renderBattleLog();
 }

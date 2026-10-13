@@ -9,6 +9,7 @@ export const gameState = {
   changeCount: 3,
   wins: 0,
   loses: 0,
+  draws: 0,
   selectedCardId: null,
   isBattling: false,
   battleLog: []
@@ -25,6 +26,7 @@ export function resetGameState(mode) {
   gameState.usedOpp = [];
   gameState.wins = 0;
   gameState.loses = 0;
+  gameState.draws = 0;
   gameState.selectedCardId = null;
   gameState.isBattling = false;
   gameState.battleLog = [];

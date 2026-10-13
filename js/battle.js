@@ -47,11 +47,15 @@ export async function deploySelectedCard() {
   renderVsCard('vs-opp-card', oppCard);
 
   const myWin = myCard.power > oppCard.power;
+  const isDraw = myCard.power === oppCard.power;
   const stamp = document.getElementById('battle-result-stamp');
   const resultText = document.getElementById('result-text');
   stamp.classList.remove('hidden');
 
-  if (myWin) {
+  if (isDraw) {
+    resultText.innerHTML = `<span class="text-amber-400">무승부</span>`;
+    gameState.draws++;
+  } else if (myWin) {
     resultText.innerHTML = `<span class="text-emerald-400">WIN</span>`;
     document.getElementById('vs-my-card').classList.add('gold-glow');
     document.getElementById('vs-opp-card').classList.add('cracked');
@@ -63,14 +67,15 @@ export async function deploySelectedCard() {
     gameState.loses++;
   }
 
-  gameState.usedPlayer.unshift({ ...myCard, win: myWin });
-  gameState.usedOpp.unshift({ ...oppCard, win: !myWin });
+  gameState.usedPlayer.unshift({ ...myCard, win: myWin, draw: isDraw });
+  gameState.usedOpp.unshift({ ...oppCard, win: !myWin && !isDraw, draw: isDraw });
 
   gameState.battleLog.push({
     battleNum: gameState.battleLog.length + 1,
     myCard: { ...myCard },
     oppCard: { ...oppCard },
-    win: myWin
+    win: myWin,
+    draw: isDraw
   });
 
   updateBattleUI();
