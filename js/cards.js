@@ -31,7 +31,7 @@ export function dealCards(mode) {
 export function createCardElement(card, onClick = null) {
   const el = document.createElement('div');
   el.className = `card bg-zinc-900 border-2 ${getGradeBorder(card.grade)} rounded-2xl overflow-hidden cursor-pointer`;
-  const imgSrc = `${IMAGE_BASE}${card.id}.jpg`;
+  const imgSrc = `${IMAGE_BASE}${card.id}.webp`;
   const placeholder = `https://picsum.photos/id/${(parseInt(card.id) % 200) + 29}/300/380`;
 
   el.innerHTML = `
@@ -56,7 +56,7 @@ export function createCardElement(card, onClick = null) {
 
 export function renderVsCard(containerId, card) {
   const container = document.getElementById(containerId);
-  const imgSrc = `${IMAGE_BASE}${card.id}.jpg`;
+  const imgSrc = `${IMAGE_BASE}${card.id}.webp`;
   container.innerHTML = `
     <div class="relative">
       <img src="${imgSrc}" class="w-full h-52 object-cover" onerror="this.src='https://picsum.photos/id/29/300/380'">

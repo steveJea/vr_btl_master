@@ -78,7 +78,7 @@ export function renderMyHand() {
   gameState.remainingPlayer.forEach(card => {
     const el = document.createElement('div');
     el.className = `card flex-shrink-0 w-36 bg-zinc-900 border-2 ${getGradeBorder(card.grade)} rounded-2xl overflow-hidden cursor-pointer`;
-    const imgSrc = `${IMAGE_BASE}${card.id}.jpg`;
+    const imgSrc = `${IMAGE_BASE}${card.id}.webp`;
 
     el.innerHTML = `
       <div class="relative h-28">
@@ -149,7 +149,7 @@ export function renderUsedCards() {
   gameState.usedOpp.slice(0, 6).forEach(u => {
     const d = document.createElement('div');
     d.className = `w-10 h-12 rounded-lg overflow-hidden border cursor-pointer ${u.draw ? 'border-amber-400' : u.win ? 'border-emerald-400' : 'border-red-600'}`;
-    d.style.background = `url('${IMAGE_BASE}${u.id}.jpg') center/cover`;
+    d.style.background = `url('${IMAGE_BASE}${u.id}.webp') center/cover`;
     d.onclick = () => showCardModal(u);
     oppUsed.appendChild(d);
   });
@@ -160,7 +160,7 @@ export function renderUsedCards() {
   gameState.usedPlayer.slice(0, 8).forEach(u => {
     const d = document.createElement('div');
     d.className = `w-10 h-12 rounded-lg overflow-hidden border cursor-pointer ${u.draw ? 'border-amber-400' : u.win ? 'border-emerald-400' : 'border-red-600'}`;
-    d.style.background = `url('${IMAGE_BASE}${u.id}.jpg') center/cover`;
+    d.style.background = `url('${IMAGE_BASE}${u.id}.webp') center/cover`;
     d.onclick = () => showCardModal(u);
     myUsed.appendChild(d);
   });
@@ -177,7 +177,7 @@ export function showCardModal(card) {
     return;
   }
 
-  const imgSrc = `${IMAGE_BASE}${card.id}.jpg`;
+  const imgSrc = `${IMAGE_BASE}${card.id}.webp`;
 
   content.innerHTML = `
     <div class="relative h-80">
@@ -270,14 +270,14 @@ export function renderBattleLog() {
 
     const myCardImg = document.createElement('div');
     myCardImg.className = `w-14 h-14 rounded-xl overflow-hidden border-2 ${myWinClass} flex-shrink-0 cursor-pointer`;
-    myCardImg.style.backgroundImage = `url('${IMAGE_BASE}${log.myCard.id}.jpg')`;
+    myCardImg.style.backgroundImage = `url('${IMAGE_BASE}${log.myCard.id}.webp')`;
     myCardImg.style.backgroundSize = 'cover';
     myCardImg.style.backgroundPosition = 'center';
     myCardImg.onclick = () => showCardModal(log.myCard);
 
     const oppCardImg = document.createElement('div');
     oppCardImg.className = `w-14 h-14 rounded-xl overflow-hidden border-2 ${oppWinClass} flex-shrink-0 cursor-pointer`;
-    oppCardImg.style.backgroundImage = `url('${IMAGE_BASE}${log.oppCard.id}.jpg')`;
+    oppCardImg.style.backgroundImage = `url('${IMAGE_BASE}${log.oppCard.id}.webp')`;
     oppCardImg.style.backgroundSize = 'cover';
     oppCardImg.style.backgroundPosition = 'center';
     oppCardImg.onclick = () => showCardModal(log.oppCard);
