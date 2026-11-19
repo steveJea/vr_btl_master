@@ -138,19 +138,38 @@ export function updateBattleUI() {
   document.getElementById('hand-count').textContent = `${left}장 남음`;
 }
 
+let handPowerDesc = true;
+
+export function toggleHandSort() {
+  handPowerDesc = !handPowerDesc;
+  renderMyHand();
+}
+
 export function renderMyHand() {
   const container = document.getElementById('my-hand');
+  const sortBtn = document.getElementById('hand-sort');
+  if (sortBtn) {
+    sortBtn.textContent = handPowerDesc ? 'POWER ↓' : 'POWER ↑';
+    sortBtn.setAttribute('aria-pressed', handPowerDesc ? 'true' : 'false');
+  }
   container.replaceChildren();
-  gameState.remainingPlayer.forEach((card) => {
+  const cards = [...gameState.remainingPlayer].sort((a, b) => {
+    const delta = handPowerDesc ? b.power - a.power : a.power - b.power;
+    return delta || String(a.id).localeCompare(String(b.id));
+  });
+  cards.forEach((card) => {
     const el = document.createElement('button');
     el.type = 'button';
     el.className = `hand-card ${getGradeClass(card.grade)}`;
+    if (card.id === gameState.selectedCardId) el.classList.add('is-selected');
+    el.setAttribute('aria-pressed', card.id === gameState.selectedCardId ? 'true' : 'false');
     el.innerHTML = `
       <span class="hand-art">${cardImgHtml(card.id, { alt: card.name })}</span>
       <span class="hand-name">${esc(card.name)}</span>
     `;
     el.addEventListener('click', () => {
       gameState.selectedCardId = card.id;
+      renderMyHand();
       showDeployBar(card);
     });
     container.appendChild(el);
@@ -164,11 +183,10 @@ export function showDeployBar(card) {
   bar.innerHTML = `
     <div class="deploy-inner">
       <div class="deploy-copy">
-        <div class="deploy-kicker">선택됨</div>
         <div class="deploy-name">${esc(card.name)}</div>
       </div>
-      <button type="button" id="info-btn" class="btn-ghost">정보</button>
-      <button type="button" id="deploy-btn" class="btn-deploy">내기</button>
+      <button type="button" id="info-btn" class="btn-ghost">상세정보</button>
+      <button type="button" id="deploy-btn" class="btn-deploy">제출</button>
       <button type="button" id="cancel-btn" class="btn-text">취소</button>
     </div>
   `;
@@ -179,8 +197,10 @@ export function showDeployBar(card) {
     import('./battle.js').then((mod) => mod.deploySelectedCard());
   });
   document.getElementById('cancel-btn').addEventListener('click', () => {
+    gameState.selectedCardId = null;
     bar.remove();
     document.body.classList.remove('deploying');
+    renderMyHand();
   });
 }
 

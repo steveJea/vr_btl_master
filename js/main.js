@@ -10,6 +10,7 @@ import {
   renderSharedBanner,
   showBattleScreen,
   showDeckScreen,
+  toggleHandSort,
   showRankScreen,
   showScreen
 } from './ui.js';
@@ -106,6 +107,7 @@ async function init() {
   bind('mute-btn', () => window.toggleMuteBtn());
   bind('change-btn', () => window.changeDeck());
   bind('confirm-btn', () => window.confirmDeck());
+  bind('hand-sort', () => toggleHandSort());
   bind('rank-open-btn', () => window.showRank());
   bind('result-rank', () => window.showRank(gameState.mode));
   bind('result-home', () => window.goHome());
