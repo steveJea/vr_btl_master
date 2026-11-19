@@ -5,7 +5,8 @@ export const THUMB_BASE = 'https://raw.githubusercontent.com/steveJea/vr-tcg/mai
 export const CARD_DATA_URL = './data/cards.json';
 export const CARD_FALLBACK = './img/card-fallback.svg';
 
-// 화면 배경음. 재생하는 곡만 받고, 시작 전에 네 곡을 미리 받지 않는다.
+// 화면 배경음. 각 곡은 기존 트랙을 약 45초로 자른 루프다.
+// 배틀 시작 뒤에, 지금 화면의 곡만 받는다.
 export const BGM = {
   main: './bgm/Battle%20Master.mp3',
   select: './bgm/Where%20is%20my%20Hero.mp3',

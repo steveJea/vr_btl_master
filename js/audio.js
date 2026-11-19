@@ -4,6 +4,7 @@ let currentAudio = null;
 let currentKey = null;
 let isMuted = false;
 let hasUserInteracted = false;
+let musicArmed = false;
 const audioCache = {};
 
 function getAudio(key) {
@@ -23,7 +24,14 @@ export function unlockAudio() {
   hasUserInteracted = true;
 }
 
+/** 배틀 시작을 누른 뒤에만 음원 주소를 붙인다. */
+export function armMusic() {
+  hasUserInteracted = true;
+  musicArmed = true;
+}
+
 export function playBGM(key) {
+  if (!musicArmed) return;
   const next = getAudio(key);
   if (!next) return;
   if (currentKey === key && currentAudio && !currentAudio.paused) return;

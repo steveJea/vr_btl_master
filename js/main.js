@@ -15,7 +15,7 @@ import {
 } from './ui.js';
 import { invalidateBattle } from './battle.js';
 import { shuffle } from './utils.js';
-import { playBGM, toggleMute, unlockAudio } from './audio.js';
+import { armMusic, toggleMute, unlockAudio } from './audio.js';
 
 let cardsReady = false;
 
@@ -34,7 +34,7 @@ window.startDefaultGame = function startDefaultGame() {
 
 window.selectGameMode = function selectGameMode(mode) {
   if (!cardsReady) return;
-  unlockAudio();
+  armMusic();
   resetGameState(mode);
   gameState.playerDeck = dealCards(mode);
   gameState.opponentDeck = dealCards(mode);
@@ -104,8 +104,6 @@ async function init() {
 
   bind('start-btn', () => window.startDefaultGame());
   bind('mode-other-btn', () => {
-    unlockAudio();
-    playBGM('select');
     showScreen('choice-screen');
   });
   bind('home-btn', () => window.goHome());

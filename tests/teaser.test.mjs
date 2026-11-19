@@ -90,6 +90,20 @@ test('a submitted board only accepts real rounds', () => {
   assert.equal(ok.wins + ok.loses + ok.draws, 5);
 });
 
+test('music stays unloaded until a battle actually starts', () => {
+  const audio = readFileSync(new URL('../js/audio.js', import.meta.url), 'utf8');
+  const main = readFileSync(new URL('../js/main.js', import.meta.url), 'utf8');
+  const play = audio.slice(audio.indexOf('export function playBGM'));
+  assert.match(play, /if \(!musicArmed\) return;[\s\S]*getAudio\(key\)/);
+  assert.match(main, /armMusic\(\)/);
+  assert.equal(main.includes("playBGM('select')"), false);
+  const config = readFileSync(new URL('../js/config.js', import.meta.url), 'utf8');
+  assert.match(config, /Battle%20Master\.mp3/);
+  assert.match(config, /Where%20is%20my%20Hero\.mp3/);
+  assert.match(config, /Battle%20yourself\.mp3/);
+  assert.match(config, /Who%20is%20the%20winner\.mp3/);
+});
+
 test('client surfaces do not show age, the main game, picsum, or a key-prompt', () => {
   const files = ['index.html', 'js/ui.js', 'js/cards.js', 'js/main.js', 'js/share.js', 'js/footer.js', 'css/style.css'];
   const blob = files.map((file) => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8')).join('\n');
