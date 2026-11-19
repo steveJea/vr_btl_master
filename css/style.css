@@ -78,19 +78,71 @@ h1, h2, h3 { font-weight: 800; letter-spacing: -0.03em; margin: 0; }
 .screen { padding: 18px 0 28px; }
 .screen-title { padding-top: 0; }
 
-.hero-art { position: relative; height: min(92dvh, 920px); overflow: hidden; background: #120910; }
-.hero-art img { width: 100%; height: 100%; object-fit: cover; object-position: center 12%; }
-.hero-art::after {
-  content: "";
-  position: absolute; inset: auto 0 0; z-index: 1;
-  height: 48%;
-  background: linear-gradient(transparent, rgba(7, 6, 12, 0.2) 20%, var(--bg));
-  pointer-events: none;
+body:has(#main-screen.active) .topbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0));
+  border-bottom-color: transparent;
+  backdrop-filter: none;
+}
+.hero-art {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  background: #07060c;
+}
+.hero-frame {
+  position: relative;
+  height: 100svh;
+  width: min(100vw, calc(100svh * 1080 / 1920));
+}
+.hero-frame picture, .hero-frame img {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center center;
+}
+.hero-top {
+  position: absolute;
+  z-index: 2;
+  left: 16px;
+  right: 16px;
+  top: 0;
+  height: 18%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 4px;
+  overflow: hidden;
+}
+.hero-top h1 {
+  font-size: clamp(26px, 4vh, 64px);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.85);
+}
+.hero-top .lede {
+  margin-top: 6px;
+  color: #f6f1ea;
+  font-size: clamp(12px, 1.55vh, 18px);
+  line-height: 1.35;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
 }
 .hero-copy {
-  position: absolute; z-index: 2;
-  left: 16px; right: 16px; bottom: calc(14px + var(--safe-b));
+  position: absolute;
+  z-index: 2;
+  left: 16px;
+  right: 16px;
+  bottom: 0;
+  height: 22%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  padding-bottom: var(--safe-b);
 }
+.hero-copy .btn-start,
+.hero-copy .btn-text { margin-top: 0; }
 .hero-name {
   margin: 0 0 8px;
   font-size: clamp(56px, 18vw, 104px);
@@ -109,6 +161,12 @@ h1 span {
   background-clip: text;
   color: transparent;
 }
+.screen-title .hero-top h1 {
+  font-size: clamp(26px, 4vh, 64px);
+  line-height: 0.95;
+}
+.screen-title .hero-top h1 span { display: inline; margin-right: 0.18em; }
+.hero-frame picture { display: block; height: 100%; }
 .btn-start, .btn-deploy {
   display: inline-flex; align-items: center; justify-content: center;
   width: 100%;

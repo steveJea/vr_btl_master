@@ -1,7 +1,7 @@
-import { findFeatured, loadRealData } from './data.js?v=6';
-import { resolvedDefaultMode } from './config.js?v=6';
-import { gameState, resetGameState } from './state.js?v=6';
-import { dealCards } from './cards.js?v=6';
+import { findFeatured, loadRealData } from './data.js?v=7';
+import { resolvedDefaultMode } from './config.js?v=7';
+import { gameState, resetGameState } from './state.js?v=7';
+import { dealCards } from './cards.js?v=7';
 import {
   hideCardModal,
   renderChannels,
@@ -14,10 +14,10 @@ import {
   toggleHandSort,
   showRankScreen,
   showScreen
-} from './ui.js?v=6';
-import { invalidateBattle } from './battle.js?v=6';
-import { shuffle } from './utils.js?v=6';
-import { armMusic, toggleMute, unlockAudio } from './audio.js?v=6';
+} from './ui.js?v=7';
+import { invalidateBattle } from './battle.js?v=7';
+import { shuffle } from './utils.js?v=7';
+import { armMusic, toggleMute, unlockAudio } from './audio.js?v=7';
 
 let cardsReady = false;
 

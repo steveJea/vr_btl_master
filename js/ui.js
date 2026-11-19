@@ -1,12 +1,12 @@
-import { OFFICIAL_CHANNELS, MODE_COPY, MODE_DISTRIBUTION, resolvedDefaultMode } from './config.js?v=6';
-import { gameState } from './state.js?v=6';
-import { cardImgHtml, createCardElement } from './cards.js?v=6';
-import { cardPool } from './data.js?v=6';
-import { byPower, esc, fmtNum, genderLabel, getGradeClass } from './utils.js?v=6';
-import { playBGM } from './audio.js?v=6';
-import { renderShareBar } from './share.js?v=6';
-import { fetchBoard, rankNote, submitRun } from './ranking.js?v=6';
-import { indexCards, pickSpotlight, readSharedQuery, spotlightLabel } from './rank-core.js?v=6';
+import { OFFICIAL_CHANNELS, MODE_COPY, MODE_DISTRIBUTION, resolvedDefaultMode } from './config.js?v=7';
+import { gameState } from './state.js?v=7';
+import { cardImgHtml, createCardElement } from './cards.js?v=7';
+import { cardPool } from './data.js?v=7';
+import { byPower, esc, fmtNum, genderLabel, getGradeClass } from './utils.js?v=7';
+import { playBGM } from './audio.js?v=7';
+import { renderShareBar } from './share.js?v=7';
+import { fetchBoard, rankNote, submitRun } from './ranking.js?v=7';
+import { indexCards, pickSpotlight, readSharedQuery, spotlightLabel } from './rank-core.js?v=7';
 
 let rankMode = resolvedDefaultMode();
 
@@ -211,7 +211,7 @@ export function showDeployBar(card) {
   document.body.classList.add('deploying');
   document.getElementById('info-btn').addEventListener('click', () => showCardModal(card));
   document.getElementById('deploy-btn').addEventListener('click', () => {
-    import('./battle.js?v=6').then((mod) => mod.deploySelectedCard());
+    import('./battle.js?v=7').then((mod) => mod.deploySelectedCard());
   });
   document.getElementById('cancel-btn').addEventListener('click', () => {
     gameState.selectedCardId = null;

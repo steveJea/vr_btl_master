@@ -1,4 +1,4 @@
-import { RANK_API_BASE } from './config.js?v=6';
+import { RANK_API_BASE } from './config.js?v=7';
 
 function endpoint(path) {
   return `${RANK_API_BASE}${path}`;

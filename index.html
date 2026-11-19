@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <link rel="canonical" href="https://battle.mbbs.kr/">
   <link rel="icon" href="./favicon.png">
-  <link rel="preload" as="image" href="./img/featured.webp">
+  <link rel="preload" as="image" href="./img/teaser-title.webp?v=7" type="image/webp">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="VR Battle Masters">
   <meta property="og:locale" content="ko_KR">
@@ -28,7 +28,7 @@
   <meta name="twitter:image" content="https://battle.mbbs.kr/img/og.jpg">
   <meta name="twitter:image:alt" content="임유리">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"VR Battle Masters","description":"어비스게이트의 느낌을 살린 카드 배틀입니다. 여러분만의 덱을 완성해보세요!","url":"https://battle.mbbs.kr/","image":"https://battle.mbbs.kr/img/og.jpg","inLanguage":"ko","genre":"CardGame","gamePlatform":["Web browser","Mobile"],"applicationCategory":"Game","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}</script>
-  <link rel="stylesheet" href="./css/style.css?v=6">
+  <link rel="stylesheet" href="./css/style.css?v=7">
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -63,16 +63,21 @@
   <main>
     <section id="main-screen" class="section screen-title">
       <div class="hero-art">
-        <img id="featured-art" src="./img/featured.webp" alt="임유리" width="840" height="1260">
-        <div class="hero-copy">
-          <button id="start-btn" class="btn-start" type="button">배틀 시작</button>
-          <button id="mode-other-btn" class="btn-text" type="button">라운드 변경하기</button>
+        <div class="hero-frame">
+          <picture>
+            <source srcset="./img/teaser-title.webp?v=7" type="image/webp">
+            <img id="featured-art" src="./img/teaser-title.png?v=7" alt="임유리" width="1080" height="1920">
+          </picture>
+          <div class="hero-top">
+            <h1><span>VR</span>BATTLE MASTERS</h1>
+            <p class="lede">어비스게이트의 느낌을 살린 카드 배틀입니다. 여러분만의 덱을 완성해보세요!</p>
+            <p id="shared-banner" class="shared-banner" hidden></p>
+          </div>
+          <div class="hero-copy">
+            <button id="start-btn" class="btn-start" type="button">배틀 시작</button>
+            <button id="mode-other-btn" class="btn-text" type="button">라운드 변경하기</button>
+          </div>
         </div>
-      </div>
-      <div class="title-block wrap">
-        <h1><span>VR</span>BATTLE MASTERS</h1>
-        <p class="lede">어비스게이트의 느낌을 살린 카드 배틀입니다. 여러분만의 덱을 완성해보세요!</p>
-        <p id="shared-banner" class="shared-banner" hidden></p>
       </div>
       <ol class="howto wrap" id="howto">
         <li><b>기본 10 Vs. 10</b><span>5 Vs. 5 또는 20 Vs. 20으로 배틀할 수 있습니다.</span></li>
@@ -209,7 +214,7 @@
     <div class="modal-card" id="modal-content"></div>
   </div>
 
-  <script type="module" src="./js/main.js?v=6"></script>
-  <script src="js/footer.js?v=6" data-current="battle" data-mode="flow" data-show="#main-screen,#choice-screen,#deck-screen,#result-screen,#rank-screen"></script>
+  <script type="module" src="./js/main.js?v=7"></script>
+  <script src="js/footer.js?v=7" data-current="battle" data-mode="flow" data-show="#main-screen,#choice-screen,#deck-screen,#result-screen,#rank-screen"></script>
 </body>
 </html>

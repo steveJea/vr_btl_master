@@ -1,6 +1,6 @@
-import { CARD_FALLBACK, IMAGE_BASE, INCLUDE_MALE_CARDS, MODE_DISTRIBUTION, THUMB_BASE } from './config.js?v=6';
-import { cardPool } from './data.js?v=6';
-import { esc, fmtNum, getGradeClass, shuffle } from './utils.js?v=6';
+import { CARD_FALLBACK, IMAGE_BASE, INCLUDE_MALE_CARDS, MODE_DISTRIBUTION, THUMB_BASE } from './config.js?v=7';
+import { cardPool } from './data.js?v=7';
+import { esc, fmtNum, getGradeClass, shuffle } from './utils.js?v=7';
 
 export function dealCards(mode) {
   const dist = MODE_DISTRIBUTION[mode];

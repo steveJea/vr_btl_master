@@ -1,4 +1,4 @@
-import { GRADE_COLORS } from './config.js?v=6';
+import { GRADE_COLORS } from './config.js?v=7';
 
 export function shuffle(arr) {
   const copy = [...arr];

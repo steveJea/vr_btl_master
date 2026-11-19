@@ -2,7 +2,7 @@
 
 export const IMAGE_BASE = 'https://raw.githubusercontent.com/steveJea/vr-ideal-worldcup/main/img/bt_img/';
 export const THUMB_BASE = 'https://raw.githubusercontent.com/steveJea/vr-tcg/main/img/thumb/';
-export const CARD_DATA_URL = './data/cards.json?v=6';
+export const CARD_DATA_URL = './data/cards.json?v=7';
 export const CARD_FALLBACK = './img/card-fallback.svg';
 
 // 화면 배경음. 각 곡은 기존 트랙을 약 45초로 자른 루프다.
