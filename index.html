@@ -28,7 +28,7 @@
   <meta name="twitter:image" content="https://battle.mbbs.kr/img/og.jpg">
   <meta name="twitter:image:alt" content="임유리">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"VideoGame","name":"VR Battle Masters","description":"어비스게이트의 느낌을 살린 카드 배틀입니다. 여러분만의 덱을 완성해보세요!","url":"https://battle.mbbs.kr/","image":"https://battle.mbbs.kr/img/og.jpg","inLanguage":"ko","genre":"CardGame","gamePlatform":["Web browser","Mobile"],"applicationCategory":"Game","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"}}</script>
-  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/style.css?v=6">
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -106,6 +106,13 @@
             <button id="confirm-btn" class="btn-start btn-compact" type="button">이 덱으로 배틀</button>
           </div>
         </div>
+        <div class="deck-summary">
+          <div class="deck-total">
+            <span>Total Power</span>
+            <strong id="deck-total">0</strong>
+          </div>
+          <button type="button" id="deck-sort" class="sort-toggle">POWER 높은순</button>
+        </div>
         <div id="deck-grid" class="deck-grid"></div>
       </div>
     </section>
@@ -147,7 +154,7 @@
         <div class="hand-block">
           <div class="lane-label hand-label">
             <span>My Deck</span>
-            <button type="button" id="hand-sort" class="sort-toggle">POWER ↓</button>
+            <button type="button" id="hand-sort" class="sort-toggle">POWER 높은순</button>
             <span id="hand-count"></span>
           </div>
           <div id="my-hand" class="hand-row"></div>
@@ -202,7 +209,7 @@
     <div class="modal-card" id="modal-content"></div>
   </div>
 
-  <script type="module" src="./js/main.js"></script>
-  <script src="js/footer.js" data-current="battle" data-mode="flow" data-show="#main-screen,#choice-screen,#deck-screen,#result-screen,#rank-screen"></script>
+  <script type="module" src="./js/main.js?v=6"></script>
+  <script src="js/footer.js?v=6" data-current="battle" data-mode="flow" data-show="#main-screen,#choice-screen,#deck-screen,#result-screen,#rank-screen"></script>
 </body>
 </html>

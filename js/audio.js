@@ -1,4 +1,4 @@
-import { BGM } from './config.js';
+import { BGM } from './config.js?v=6';
 
 let currentAudio = null;
 let currentKey = null;

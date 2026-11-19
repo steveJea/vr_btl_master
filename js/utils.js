@@ -1,4 +1,4 @@
-import { GRADE_COLORS } from './config.js';
+import { GRADE_COLORS } from './config.js?v=6';
 
 export function shuffle(arr) {
   const copy = [...arr];
@@ -31,6 +31,14 @@ export function esc(value) {
     '"': '&quot;',
     "'": '&#39;'
   }[ch]));
+}
+
+export function byPower(desc = true) {
+  const sign = desc ? -1 : 1;
+  return (a, b) => {
+    const delta = (Number(a.power) - Number(b.power)) * sign;
+    return delta || String(a.id).localeCompare(String(b.id));
+  };
 }
 
 export function genderLabel(gender) {

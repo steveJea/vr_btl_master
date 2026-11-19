@@ -1,12 +1,12 @@
-import { OFFICIAL_CHANNELS, MODE_COPY, MODE_DISTRIBUTION, resolvedDefaultMode } from './config.js';
-import { gameState } from './state.js';
-import { cardImgHtml, createCardElement } from './cards.js';
-import { cardPool } from './data.js';
-import { esc, fmtNum, genderLabel, getGradeClass } from './utils.js';
-import { playBGM } from './audio.js';
-import { renderShareBar } from './share.js';
-import { fetchBoard, rankNote, submitRun } from './ranking.js';
-import { indexCards, pickSpotlight, readSharedQuery, spotlightLabel } from './rank-core.js';
+import { OFFICIAL_CHANNELS, MODE_COPY, MODE_DISTRIBUTION, resolvedDefaultMode } from './config.js?v=6';
+import { gameState } from './state.js?v=6';
+import { cardImgHtml, createCardElement } from './cards.js?v=6';
+import { cardPool } from './data.js?v=6';
+import { byPower, esc, fmtNum, genderLabel, getGradeClass } from './utils.js?v=6';
+import { playBGM } from './audio.js?v=6';
+import { renderShareBar } from './share.js?v=6';
+import { fetchBoard, rankNote, submitRun } from './ranking.js?v=6';
+import { indexCards, pickSpotlight, readSharedQuery, spotlightLabel } from './rank-core.js?v=6';
 
 let rankMode = resolvedDefaultMode();
 
@@ -97,11 +97,28 @@ export function showDeckScreen() {
   renderDeckGrid();
 }
 
+let deckPowerDesc = true;
+
+export function toggleDeckSort() {
+  deckPowerDesc = !deckPowerDesc;
+  renderDeckGrid();
+}
+
 export function renderDeckGrid() {
   const grid = document.getElementById('deck-grid');
+  const sortBtn = document.getElementById('deck-sort');
+  if (sortBtn) {
+    sortBtn.textContent = deckPowerDesc ? 'POWER 높은순' : 'POWER 낮은순';
+    sortBtn.setAttribute('aria-pressed', deckPowerDesc ? 'true' : 'false');
+  }
+  const total = gameState.playerDeck.reduce((sum, card) => sum + Number(card.power || 0), 0);
+  const totalEl = document.getElementById('deck-total');
+  if (totalEl) totalEl.textContent = fmtNum(total);
   grid.replaceChildren();
-  gameState.playerDeck.forEach((card) => {
-    grid.appendChild(createCardElement(card, showCardModal));
+  [...gameState.playerDeck].sort(byPower(deckPowerDesc)).forEach((card) => {
+    const el = createCardElement(card, showCardModal);
+    el.dataset.power = String(card.power);
+    grid.appendChild(el);
   });
 }
 
@@ -149,23 +166,23 @@ export function renderMyHand() {
   const container = document.getElementById('my-hand');
   const sortBtn = document.getElementById('hand-sort');
   if (sortBtn) {
-    sortBtn.textContent = handPowerDesc ? 'POWER ↓' : 'POWER ↑';
+    sortBtn.textContent = handPowerDesc ? 'POWER 높은순' : 'POWER 낮은순';
     sortBtn.setAttribute('aria-pressed', handPowerDesc ? 'true' : 'false');
   }
   container.replaceChildren();
-  const cards = [...gameState.remainingPlayer].sort((a, b) => {
-    const delta = handPowerDesc ? b.power - a.power : a.power - b.power;
-    return delta || String(a.id).localeCompare(String(b.id));
-  });
+  const cards = [...gameState.remainingPlayer].sort(byPower(handPowerDesc));
   cards.forEach((card) => {
     const el = document.createElement('button');
     el.type = 'button';
-    el.className = `hand-card ${getGradeClass(card.grade)}`;
-    if (card.id === gameState.selectedCardId) el.classList.add('is-selected');
-    el.setAttribute('aria-pressed', card.id === gameState.selectedCardId ? 'true' : 'false');
+    const selected = card.id === gameState.selectedCardId;
+    el.className = `hand-card ${getGradeClass(card.grade)}${selected ? ' is-selected' : ''}`;
+    el.dataset.power = String(card.power);
+    el.setAttribute('aria-pressed', selected ? 'true' : 'false');
     el.innerHTML = `
       <span class="hand-art">${cardImgHtml(card.id, { alt: card.name })}</span>
+      ${selected ? '<i class="spark" aria-hidden="true"></i><i class="spark s2" aria-hidden="true"></i><i class="spark s3" aria-hidden="true"></i>' : ''}
       <span class="hand-name">${esc(card.name)}</span>
+      <span class="hand-power">POWER ${fmtNum(card.power)}</span>
     `;
     el.addEventListener('click', () => {
       gameState.selectedCardId = card.id;
@@ -194,7 +211,7 @@ export function showDeployBar(card) {
   document.body.classList.add('deploying');
   document.getElementById('info-btn').addEventListener('click', () => showCardModal(card));
   document.getElementById('deploy-btn').addEventListener('click', () => {
-    import('./battle.js').then((mod) => mod.deploySelectedCard());
+    import('./battle.js?v=6').then((mod) => mod.deploySelectedCard());
   });
   document.getElementById('cancel-btn').addEventListener('click', () => {
     gameState.selectedCardId = null;

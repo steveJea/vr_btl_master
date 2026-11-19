@@ -1,4 +1,4 @@
-import { CARD_DATA_URL, FEATURED_HEROINE_NAME, INCLUDE_MALE_CARDS } from './config.js';
+import { CARD_DATA_URL, FEATURED_HEROINE_NAME, INCLUDE_MALE_CARDS } from './config.js?v=6';
 
 export let cardPool = [];
 

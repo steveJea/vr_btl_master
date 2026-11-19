@@ -1,7 +1,7 @@
-import { findFeatured, loadRealData } from './data.js';
-import { resolvedDefaultMode } from './config.js';
-import { gameState, resetGameState } from './state.js';
-import { dealCards } from './cards.js';
+import { findFeatured, loadRealData } from './data.js?v=6';
+import { resolvedDefaultMode } from './config.js?v=6';
+import { gameState, resetGameState } from './state.js?v=6';
+import { dealCards } from './cards.js?v=6';
 import {
   hideCardModal,
   renderChannels,
@@ -10,13 +10,14 @@ import {
   renderSharedBanner,
   showBattleScreen,
   showDeckScreen,
+  toggleDeckSort,
   toggleHandSort,
   showRankScreen,
   showScreen
-} from './ui.js';
-import { invalidateBattle } from './battle.js';
-import { shuffle } from './utils.js';
-import { armMusic, toggleMute, unlockAudio } from './audio.js';
+} from './ui.js?v=6';
+import { invalidateBattle } from './battle.js?v=6';
+import { shuffle } from './utils.js?v=6';
+import { armMusic, toggleMute, unlockAudio } from './audio.js?v=6';
 
 let cardsReady = false;
 
@@ -108,6 +109,7 @@ async function init() {
   bind('change-btn', () => window.changeDeck());
   bind('confirm-btn', () => window.confirmDeck());
   bind('hand-sort', () => toggleHandSort());
+  bind('deck-sort', () => toggleDeckSort());
   bind('rank-open-btn', () => window.showRank());
   bind('result-rank', () => window.showRank(gameState.mode));
   bind('result-home', () => window.goHome());

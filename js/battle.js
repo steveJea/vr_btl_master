@@ -1,12 +1,12 @@
-import { gameState } from './state.js';
-import { renderVsCard } from './cards.js';
+import { gameState } from './state.js?v=6';
+import { renderVsCard } from './cards.js?v=6';
 import {
   updateBattleUI,
   renderMyHand,
   renderOppRemaining,
   renderUsedCards,
   finishGame
-} from './ui.js';
+} from './ui.js?v=6';
 
 let battleSeq = 0;
 

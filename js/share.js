@@ -1,6 +1,6 @@
-import { SHARE_PROVIDERS } from './config.js';
-import { buildShareText, buildShareUrl } from './rank-core.js';
-import { fmtNum } from './utils.js';
+import { SHARE_PROVIDERS } from './config.js?v=6';
+import { buildShareText, buildShareUrl } from './rank-core.js?v=6';
+import { fmtNum } from './utils.js?v=6';
 
 function sharePayload(record) {
   const href = typeof location !== 'undefined' ? location.href : 'https://battle.mbbs.kr/';
