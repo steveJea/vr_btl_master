@@ -1,29 +1,62 @@
+// Single place for owner decisions and public links.
+// Empty strings stay hidden. Do not add a main-game call to action here.
+
 export const IMAGE_BASE = 'https://raw.githubusercontent.com/steveJea/vr-ideal-worldcup/main/img/bt_img/';
-export const CSV_URL = 'https://raw.githubusercontent.com/steveJea/vr-ideal-worldcup/main/VR_DATA.csv';
-export const VIDEO_URL = 'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bm_main.mp4';
+export const FALLBACK_ART = 'img/card-fallback.svg';
 
-// 배경 이미지
-export const MAIN_BG_IMAGE = 'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/img/main.jpg';
-
-// 배경음 (화면별)
+// One track is fetched after the player starts. Title load does not fetch audio.
 export const BGM = {
-  main:    'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bgm/Battle%20Master.mp3',
-  select:  'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bgm/Where%20is%20my%20Hero.mp3',  // 전투방식 + 카드선택
-  battle:  'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bgm/Battle%20yourself.mp3',
-  result:  'https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bgm/Who%20is%20the%20winner.mp3'
+  main: 'bgm/lite/main.mp3',
+  select: 'bgm/lite/select.mp3',
+  battle: 'bgm/lite/battle.mp3',
+  result: 'bgm/lite/result.mp3',
 };
 
-export const GRADE_COLORS = {
-  "NORMAL": "slate",
-  "RARE": "blue",
-  "HIGH RARE": "violet",
-  "SUPER RARE": "pink",
-  "ULTRA RARE": "amber",
-  "MYTHIC RARE": "red"
+/** Owner decision. true keeps male cards in the roster. */
+export const INCLUDE_MALE_CARDS = true;
+
+/** Owner decision. Default round count for the start button. Use 5 or 10. */
+export const DEFAULT_MODE = 5;
+
+/**
+ * Official channels. A row appears only when url is a non-empty http(s) link.
+ * Add another object to show another channel.
+ */
+export const OFFICIAL_CHANNELS = [
+  { id: 'primary', label: '공식 채널', url: '' },
+];
+
+/**
+ * Result share actions. The Kakao target stays off until enabled is true.
+ * Turning it on is the only step required to show that button later.
+ */
+export const SHARE_TARGETS = [
+  { id: 'native', label: '공유', enabled: true },
+  { id: 'x', label: 'X', enabled: true },
+  { id: 'copy', label: '링크 복사', enabled: true },
+  { id: 'kakao', label: '카카오톡', enabled: false },
+];
+
+/** Ranking endpoint. Same origin when this is a relative path. */
+export const RANKING_API = '/api/ranking';
+
+export const GRADE_CLASS = {
+  NORMAL: 'g-normal',
+  RARE: 'g-rare',
+  'HIGH RARE': 'g-high',
+  'SUPER RARE': 'g-super',
+  'ULTRA RARE': 'g-ultra',
+  'MYTHIC RARE': 'g-mythic',
 };
 
 export const MODE_DISTRIBUTION = {
-  5:  { "NORMAL": 2, "RARE": 1, "HIGH RARE": 1, "SUPER RARE": 0, "ULTRA RARE": 1, "MYTHIC RARE": 0 },
-  10: { "NORMAL": 5, "RARE": 2, "HIGH RARE": 1, "SUPER RARE": 1, "ULTRA RARE": 1, "MYTHIC RARE": 0 },
-  20: { "NORMAL": 10, "RARE": 4, "HIGH RARE": 2, "SUPER RARE": 2, "ULTRA RARE": 1, "MYTHIC RARE": 1 }
+  5: { NORMAL: 2, RARE: 1, 'HIGH RARE': 1, 'SUPER RARE': 0, 'ULTRA RARE': 1, 'MYTHIC RARE': 0 },
+  10: { NORMAL: 5, RARE: 2, 'HIGH RARE': 1, 'SUPER RARE': 1, 'ULTRA RARE': 1, 'MYTHIC RARE': 0 },
+  20: { NORMAL: 10, RARE: 4, 'HIGH RARE': 2, 'SUPER RARE': 2, 'ULTRA RARE': 1, 'MYTHIC RARE': 1 },
+};
+
+export const MODE_BLURB = {
+  5: '짧은 맛보기',
+  10: '한 판 더',
+  20: '긴 배틀',
 };

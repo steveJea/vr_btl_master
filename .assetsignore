@@ -1,0 +1,17 @@
+.git
+.gitignore
+node_modules
+.wrangler
+worker
+tools
+test
+wrangler.jsonc
+package.json
+package-lock.json
+bm_main.mp4
+bgm/Battle Master.mp3
+bgm/Battle yourself.mp3
+bgm/Where is my Hero.mp3
+bgm/Who is the winner.mp3
+*.md
+.dev.vars

@@ -1,20 +1,34 @@
-import { GRADE_COLORS } from './config.js';
+import { GRADE_CLASS } from './config.js';
 
 export function shuffle(arr) {
-  return [...arr].sort(() => Math.random() - 0.5);
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
 }
 
-export function getGradeColor(g) {
-  return GRADE_COLORS[g] || "slate";
+export function gradeClass(grade) {
+  return GRADE_CLASS[grade] || 'g-normal';
 }
 
-export function getGradeBorder(g) {
-  return `border-${getGradeColor(g)}-500`;
-}
-
-// 표시용 숫자 포맷 (천 단위 구분). 비교/계산에는 원래 숫자를 그대로 사용.
 const NUM_FMT = new Intl.NumberFormat('ko-KR');
 export function fmtNum(n) {
-  const v = Number(n);
-  return Number.isFinite(v) ? NUM_FMT.format(v) : (n ?? '');
+  const value = Number(n);
+  return Number.isFinite(value) ? NUM_FMT.format(value) : '';
+}
+
+export function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (ch) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[ch]));
+}
+
+export function safeId(id) {
+  return /^\d{5}$/.test(String(id)) ? String(id) : '';
 }

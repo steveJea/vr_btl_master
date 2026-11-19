@@ -1,0 +1,32 @@
+{
+  "source": "https://github.com/steveJea/vr-tcg/blob/main/data/cards.csv",
+  "previous": "https://github.com/steveJea/vr-ideal-worldcup/blob/main/VR_DATA.csv",
+  "cardCount": 454,
+  "excludedId10533": true,
+  "agePublished": false,
+  "nameChanges": [
+    {
+      "id": "10444",
+      "from": "윤부자",
+      "to": "한석열",
+      "grade": "NORMAL",
+      "gender": "MALE"
+    },
+    {
+      "id": "10098",
+      "from": "윤수두",
+      "to": "두윤창",
+      "grade": "RARE",
+      "gender": "MALE"
+    },
+    {
+      "id": "10083",
+      "from": "김희자",
+      "to": "김희건",
+      "grade": "NORMAL",
+      "gender": "FEMALE"
+    }
+  ],
+  "powerChanges": [],
+  "missingInWorldcup": []
+}

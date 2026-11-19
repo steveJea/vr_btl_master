@@ -1,0 +1,36 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "vr-battle-teaser",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-11-19",
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "head_sampling_rate": 1
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1
+    }
+  },
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  // Preview account resources. They stay valid if that account is claimed.
+  // They are not the databases behind battle.mbbs.kr or the main game.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "vr-battle-teaser-rank",
+      "database_id": "9d17425b-19e9-4b66-b061-3552cc83997d"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "RANK_KV",
+      "id": "97ff46a8dfa24365854a6e06afdec032"
+    }
+  ]
+}

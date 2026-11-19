@@ -1,0 +1,14 @@
+{
+  "name": "vr-battle-masters",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "dev": "wrangler dev",
+    "sync-cards": "python3 tools/sync-cards.py",
+    "deploy:preview": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.165.0"
+  }
+}
