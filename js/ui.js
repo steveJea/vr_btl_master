@@ -1,51 +1,124 @@
-import { IMAGE_BASE } from './config.js';
-import { gameState } from './state.js';
-import { createCardElement } from './cards.js';
-import { getGradeBorder, fmtNum } from './utils.js';
-import { playBGM } from './audio.js';
+import { OFFICIAL_CHANNELS, MODE_COPY, MODE_DISTRIBUTION, resolvedDefaultMode } from './config.js?v=7';
+import { gameState } from './state.js?v=7';
+import { cardImgHtml, createCardElement } from './cards.js?v=7';
+import { cardPool } from './data.js?v=7';
+import { byPower, esc, fmtNum, genderLabel, getGradeClass } from './utils.js?v=7';
+import { playBGM } from './audio.js?v=7';
+import { renderShareBar } from './share.js?v=7';
+import { fetchBoard, rankNote, submitRun } from './ranking.js?v=7';
+import { indexCards, pickSpotlight, readSharedQuery, spotlightLabel } from './rank-core.js?v=7';
+
+let rankMode = resolvedDefaultMode();
 
 export function showScreen(id) {
-  document.querySelectorAll('.section').forEach(s => {
-    s.classList.remove('active');
-    s.style.setProperty('display', 'none', 'important');
-  });
-  const t = document.getElementById(id);
-  if (t) {
-    t.classList.add('active');
-    t.style.setProperty('display', 'block', 'important');
-  }
+  document.querySelectorAll('.section').forEach((section) => section.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+  window.scrollTo(0, 0);
 
-  // 화면별 배경음 전환
-  switch (id) {
-    case 'main-screen':
-      playBGM('main');
-      break;
-    case 'choice-screen':
-    case 'deck-screen':
-      playBGM('select');
-      break;
-    case 'battle-screen':
-      playBGM('battle');
-      break;
-    case 'result-screen':
-      playBGM('result');
-      break;
+  if (id === 'main-screen') playBGM('main');
+  else if (id === 'choice-screen' || id === 'deck-screen') playBGM('select');
+  else if (id === 'battle-screen') playBGM('battle');
+  else if (id === 'result-screen') playBGM('result');
+}
+
+export function renderChannels(container) {
+  if (!container) return;
+  const links = OFFICIAL_CHANNELS.filter((item) => typeof item?.url === 'string' && item.url.startsWith('https://'));
+  container.replaceChildren();
+  if (!links.length) {
+    container.hidden = true;
+    return;
   }
+  container.hidden = false;
+  const label = document.createElement('p');
+  label.className = 'channel-label';
+  label.textContent = '공식 채널';
+  container.appendChild(label);
+  const row = document.createElement('div');
+  row.className = 'channel-row';
+  links.forEach((item) => {
+    const link = document.createElement('a');
+    link.href = item.url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = item.label || item.id || '채널';
+    row.appendChild(link);
+  });
+  container.appendChild(row);
+}
+
+export function renderSharedBanner() {
+  const banner = document.getElementById('shared-banner');
+  if (!banner) return;
+  const record = readSharedQuery(location.search);
+  if (!record) {
+    banner.hidden = true;
+    return;
+  }
+  const card = cardPool.find((item) => item.id === record.id);
+  banner.hidden = false;
+  banner.textContent = card
+    ? `공유된 기록 · ${record.wins}승 ${record.loses}패 ${record.draws}무 · ${card.name}`
+    : `공유된 기록 · ${record.wins}승 ${record.loses}패 ${record.draws}무`;
+}
+
+export function renderModeCards() {
+  const root = document.getElementById('mode-list');
+  if (!root) return;
+  const fallback = resolvedDefaultMode();
+  root.replaceChildren();
+  Object.keys(MODE_DISTRIBUTION).map(Number).sort((a, b) => a - b).forEach((mode) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'mode-card';
+    button.dataset.mode = String(mode);
+    if (mode === fallback) button.classList.add('is-default');
+    const copy = MODE_COPY[mode] || { title: `${mode} VS ${mode}`, blurb: '' };
+    const rows = Object.entries(MODE_DISTRIBUTION[mode]).filter(([, count]) => count > 0);
+    button.innerHTML = `
+      ${mode === fallback ? '<span class="mode-flag">기본</span>' : ''}
+      <span class="mode-title">${esc(copy.title)}</span>
+      <span class="mode-blurb">${esc(copy.blurb)}</span>
+      <span class="mode-dist">
+        ${rows.map(([grade, count]) => `<span><b>${esc(grade)}</b> ${count}</span>`).join('')}
+      </span>
+    `;
+    button.addEventListener('click', () => window.selectGameMode(mode));
+    root.appendChild(button);
+  });
 }
 
 export function showDeckScreen() {
   showScreen('deck-screen');
-  document.getElementById('mode-badge').innerText = `${gameState.mode} VS ${gameState.mode}`;
-  document.getElementById('change-count').innerText = `${gameState.changeCount}/3`;
+  document.getElementById('mode-badge').textContent = `${gameState.mode} VS ${gameState.mode}`;
+  document.getElementById('change-count').textContent = `${gameState.changeCount}/3`;
   document.getElementById('change-btn').disabled = gameState.changeCount <= 0;
+  renderDeckGrid();
+}
+
+let deckPowerDesc = true;
+
+export function toggleDeckSort() {
+  deckPowerDesc = !deckPowerDesc;
   renderDeckGrid();
 }
 
 export function renderDeckGrid() {
   const grid = document.getElementById('deck-grid');
-  grid.innerHTML = '';
-  gameState.playerDeck.forEach(card => {
-    grid.appendChild(createCardElement(card, showCardModal));
+  const sortBtn = document.getElementById('deck-sort');
+  if (sortBtn) {
+    sortBtn.textContent = deckPowerDesc ? 'POWER 높은순' : 'POWER 낮은순';
+    sortBtn.setAttribute('aria-pressed', deckPowerDesc ? 'true' : 'false');
+  }
+  const total = gameState.playerDeck.reduce((sum, card) => sum + Number(card.power || 0), 0);
+  const totalEl = document.getElementById('deck-total');
+  if (totalEl) totalEl.textContent = fmtNum(total);
+  grid.replaceChildren();
+  [...gameState.playerDeck].sort(byPower(deckPowerDesc)).forEach((card) => {
+    const el = createCardElement(card, showCardModal);
+    el.dataset.power = String(card.power);
+    grid.appendChild(el);
   });
 }
 
@@ -55,273 +128,311 @@ export function showBattleScreen() {
   renderMyHand();
   renderOppRemaining();
   renderUsedCards();
-  document.getElementById('vs-idle').classList.remove('hidden');
-  document.getElementById('vs-countdown').classList.add('hidden');
-  document.getElementById('vs-battle').classList.add('hidden');
+  document.getElementById('vs-idle')?.classList.remove('hidden');
+  document.getElementById('vs-battle')?.classList.add('hidden');
+  document.getElementById('battle-result-stamp')?.classList.add('hidden');
+  const mine = document.getElementById('vs-my-card');
+  const opp = document.getElementById('vs-opp-card');
+  if (mine) {
+    mine.innerHTML = '';
+    mine.className = 'vs-slot';
+  }
+  if (opp) {
+    opp.innerHTML = '';
+    opp.className = 'vs-slot';
+  }
 }
 
 export function updateBattleUI() {
-  const rem = gameState.remainingPlayer.length;
-  document.getElementById('battle-progress').innerText =
-    `${String(gameState.mode - rem + 1).padStart(2, '0')} / ${gameState.mode}`;
-  document.getElementById('win-count').innerText = fmtNum(gameState.wins);
-  document.getElementById('lose-count').innerText = fmtNum(gameState.loses);
-  const drawEl = document.getElementById('draw-count');
-  if (drawEl) drawEl.innerText = fmtNum(gameState.draws);
-  document.getElementById('hand-count').innerText = `${rem} cards left`;
+  const left = gameState.remainingPlayer.length;
+  const progress = document.getElementById('battle-progress');
+  if (progress) {
+    progress.textContent = `${String(Math.min(gameState.mode, gameState.mode - left + 1)).padStart(2, '0')} / ${gameState.mode}`;
+  }
+  document.getElementById('win-count').textContent = fmtNum(gameState.wins);
+  document.getElementById('lose-count').textContent = fmtNum(gameState.loses);
+  document.getElementById('draw-count').textContent = fmtNum(gameState.draws);
+  document.getElementById('hand-count').textContent = `${left}장 남음`;
+}
+
+let handPowerDesc = true;
+
+export function toggleHandSort() {
+  handPowerDesc = !handPowerDesc;
+  renderMyHand();
 }
 
 export function renderMyHand() {
   const container = document.getElementById('my-hand');
-  container.innerHTML = '';
-
-  gameState.remainingPlayer.forEach(card => {
-    const el = document.createElement('div');
-    el.className = `card flex-shrink-0 w-36 bg-zinc-900 border-2 ${getGradeBorder(card.grade)} rounded-2xl overflow-hidden cursor-pointer`;
-    const imgSrc = `${IMAGE_BASE}${card.id}.webp`;
-
+  const sortBtn = document.getElementById('hand-sort');
+  if (sortBtn) {
+    sortBtn.textContent = handPowerDesc ? 'POWER 높은순' : 'POWER 낮은순';
+    sortBtn.setAttribute('aria-pressed', handPowerDesc ? 'true' : 'false');
+  }
+  container.replaceChildren();
+  const cards = [...gameState.remainingPlayer].sort(byPower(handPowerDesc));
+  cards.forEach((card) => {
+    const el = document.createElement('button');
+    el.type = 'button';
+    const selected = card.id === gameState.selectedCardId;
+    el.className = `hand-card ${getGradeClass(card.grade)}${selected ? ' is-selected' : ''}`;
+    el.dataset.power = String(card.power);
+    el.setAttribute('aria-pressed', selected ? 'true' : 'false');
     el.innerHTML = `
-      <div class="relative h-28">
-        <img src="${imgSrc}" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/id/29/300/380'">
-        <div class="absolute top-1.5 right-1.5 px-2 py-0.5 text-[9px] font-bold bg-black/70 rounded">${card.grade.split(' ')[0]}</div>
-      </div>
-      <div class="px-2.5 py-2">
-        <div class="font-bold text-sm truncate">${card.name}</div>
-      </div>
+      <span class="hand-art">${cardImgHtml(card.id, { alt: card.name })}</span>
+      ${selected ? '<i class="spark" aria-hidden="true"></i><i class="spark s2" aria-hidden="true"></i><i class="spark s3" aria-hidden="true"></i>' : ''}
+      <span class="hand-name">${esc(card.name)}</span>
+      <span class="hand-power">POWER ${fmtNum(card.power)}</span>
     `;
-
-    el.onclick = () => {
+    el.addEventListener('click', () => {
       gameState.selectedCardId = card.id;
+      renderMyHand();
       showDeployBar(card);
-    };
+    });
     container.appendChild(el);
   });
 }
 
 export function showDeployBar(card) {
-  const old = document.getElementById('deploy-bar');
-  if (old) old.remove();
-
+  document.getElementById('deploy-bar')?.remove();
   const bar = document.createElement('div');
   bar.id = 'deploy-bar';
-  bar.className = 'fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-yellow-500/40 p-4 z-40';
   bar.innerHTML = `
-    <div class="max-w-lg mx-auto flex items-center gap-4">
-      <div class="flex-1">
-        <div class="text-xs text-yellow-400">선택됨</div>
-        <div class="font-bold">${card.name}</div>
+    <div class="deploy-inner">
+      <div class="deploy-copy">
+        <div class="deploy-name">${esc(card.name)}</div>
       </div>
-      <button id="info-btn" class="px-5 py-3 border border-white/30 hover:bg-zinc-800 rounded-xl text-sm">
-        Info
-      </button>
-      <button id="deploy-btn" class="px-8 py-3 bg-yellow-400 hover:bg-yellow-300 text-black font-extrabold rounded-xl">
-        DEPLOY
-      </button>
-      <button id="cancel-btn" class="px-4 py-3 text-sm text-zinc-400">취소</button>
+      <button type="button" id="info-btn" class="btn-ghost">상세정보</button>
+      <button type="button" id="deploy-btn" class="btn-deploy">제출</button>
+      <button type="button" id="cancel-btn" class="btn-text">취소</button>
     </div>
   `;
   document.body.appendChild(bar);
+  document.body.classList.add('deploying');
+  document.getElementById('info-btn').addEventListener('click', () => showCardModal(card));
+  document.getElementById('deploy-btn').addEventListener('click', () => {
+    import('./battle.js?v=7').then((mod) => mod.deploySelectedCard());
+  });
+  document.getElementById('cancel-btn').addEventListener('click', () => {
+    gameState.selectedCardId = null;
+    bar.remove();
+    document.body.classList.remove('deploying');
+    renderMyHand();
+  });
+}
 
-  document.getElementById('info-btn').onclick = () => showCardModal(card);
-  document.getElementById('deploy-btn').onclick = () => {
-    import('./battle.js').then(m => m.deploySelectedCard());
-  };
-  document.getElementById('cancel-btn').onclick = () => {
-    document.getElementById('deploy-bar')?.remove();
-  };
+function usedChip(card) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = `used-chip ${card.draw ? 'is-draw' : card.win ? 'is-win' : 'is-lose'}`;
+  button.innerHTML = cardImgHtml(card.id, { alt: card.name });
+  button.addEventListener('click', () => showCardModal(card));
+  return button;
 }
 
 export function renderOppRemaining() {
-  const c = document.getElementById('opp-remaining');
-  c.innerHTML = '';
+  const container = document.getElementById('opp-remaining');
+  container.replaceChildren();
   gameState.remainingOpp.forEach(() => {
-    const d = document.createElement('div');
-    d.className = 'w-10 h-14 bg-zinc-800 border border-red-900/50 rounded-lg flex items-center justify-center flex-shrink-0';
-    d.innerHTML = `<i class="fa-solid fa-question text-red-600/60 text-xl"></i>`;
-    c.appendChild(d);
+    const back = document.createElement('div');
+    back.className = 'opp-back';
+    back.textContent = 'VR';
+    container.appendChild(back);
   });
 }
 
 export function renderUsedCards() {
-  // Opponent used
   const oppUsed = document.getElementById('opp-used');
-  oppUsed.innerHTML = '';
-  gameState.usedOpp.slice(0, 6).forEach(u => {
-    const d = document.createElement('div');
-    d.className = `w-10 h-12 rounded-lg overflow-hidden border cursor-pointer ${u.draw ? 'border-amber-400' : u.win ? 'border-emerald-400' : 'border-red-600'}`;
-    d.style.background = `url('${IMAGE_BASE}${u.id}.webp') center/cover`;
-    d.onclick = () => showCardModal(u);
-    oppUsed.appendChild(d);
-  });
-
-  // My used
   const myUsed = document.getElementById('my-used');
-  myUsed.innerHTML = '';
-  gameState.usedPlayer.slice(0, 8).forEach(u => {
-    const d = document.createElement('div');
-    d.className = `w-10 h-12 rounded-lg overflow-hidden border cursor-pointer ${u.draw ? 'border-amber-400' : u.win ? 'border-emerald-400' : 'border-red-600'}`;
-    d.style.background = `url('${IMAGE_BASE}${u.id}.webp') center/cover`;
-    d.onclick = () => showCardModal(u);
-    myUsed.appendChild(d);
-  });
+  oppUsed.replaceChildren();
+  myUsed.replaceChildren();
+  gameState.usedOpp.slice(0, 8).forEach((card) => oppUsed.appendChild(usedChip(card)));
+  gameState.usedPlayer.slice(0, 8).forEach((card) => myUsed.appendChild(usedChip(card)));
 }
 
 export function showCardModal(card) {
   if (!card) return;
-
   const modal = document.getElementById('card-modal');
   const content = document.getElementById('modal-content');
-
-  if (!modal || !content) {
-    console.error('모달 요소를 찾을 수 없습니다.');
-    return;
-  }
-
-  const imgSrc = `${IMAGE_BASE}${card.id}.webp`;
-
+  if (!modal || !content) return;
+  const gender = genderLabel(card.gender);
   content.innerHTML = `
-    <div class="relative h-80">
-      <img src="${imgSrc}" class="w-full h-full object-cover object-top" onerror="this.src='https://picsum.photos/id/29/300/380'">
-      <div class="absolute inset-0 bg-gradient-to-t from-zinc-900 via-transparent to-transparent"></div>
-      <div class="absolute top-4 right-4">
-        <span class="px-3 py-1 text-sm font-bold bg-black/60 rounded-full border border-white/20">${card.grade}</span>
-      </div>
-      <div class="absolute bottom-4 left-4 right-4">
-        <div class="text-3xl font-black">${card.name}</div>
-        <div class="text-white/70 text-sm">${card.age}세 • ${card.gender} • ${card.region}</div>
+    <div class="modal-art">
+      ${cardImgHtml(card.id, { full: true, alt: card.name, eager: true })}
+      <span class="grade-pill">${esc(card.grade)}</span>
+      <div class="modal-nameblock">
+        <div class="modal-name">${esc(card.name)}</div>
+        <div class="modal-sub">${esc([gender, card.region].filter(Boolean).join(' · '))}</div>
       </div>
     </div>
-    <div class="p-5">
-      <div class="mb-4 flex items-baseline justify-between bg-zinc-800/80 rounded-xl px-4 py-2.5 border border-amber-400/40">
-        <span class="text-xs text-zinc-400 tracking-wider">POWER</span>
-        <span class="card-power font-black text-2xl text-amber-400">${fmtNum(card.power)}</span>
+    <div class="modal-sheet">
+      <div class="power-row"><span>POWER</span><b>${fmtNum(card.power)}</b></div>
+      <div class="stat-pair">
+        <div><span>CLASS</span><b>${esc(card.class || '-')}</b></div>
+        <div><span>ATTRIBUTE</span><b>${esc(card.attribute || '-')}</b></div>
       </div>
-      <div class="grid grid-cols-2 gap-4 text-sm mb-4">
-        <div>
-          <div class="text-xs text-zinc-400">CLASS</div>
-          <div class="font-bold text-lg">${card.class || '-'}</div>
-        </div>
-        <div>
-          <div class="text-xs text-zinc-400">ATTRIBUTE</div>
-          <div class="font-bold text-lg text-emerald-400">${card.attribute || '-'}</div>
-        </div>
+      <div class="stat-grid">
+        ${['HP', 'ATK', 'DEF', 'PHY', 'MEN', 'MOR'].map((key) => `<div><span>${key}</span><b>${fmtNum(card[key.toLowerCase()] || 0)}</b></div>`).join('')}
       </div>
-      <div class="grid grid-cols-3 gap-2 mb-5">
-        <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
-          <div class="text-[10px] text-zinc-400 tracking-wider">HP</div>
-          <div class="font-bold text-lg text-red-400">${fmtNum(card.hp || 0)}</div>
-        </div>
-        <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
-          <div class="text-[10px] text-zinc-400 tracking-wider">ATK</div>
-          <div class="font-bold text-lg text-orange-400">${fmtNum(card.atk || 0)}</div>
-        </div>
-        <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
-          <div class="text-[10px] text-zinc-400 tracking-wider">DEF</div>
-          <div class="font-bold text-lg text-blue-400">${fmtNum(card.def || 0)}</div>
-        </div>
-        <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
-          <div class="text-[10px] text-zinc-400 tracking-wider">PHY</div>
-          <div class="font-bold text-lg text-emerald-400">${fmtNum(card.phy || 0)}</div>
-        </div>
-        <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
-          <div class="text-[10px] text-zinc-400 tracking-wider">MEN</div>
-          <div class="font-bold text-lg text-violet-400">${fmtNum(card.men || 0)}</div>
-        </div>
-        <div class="bg-zinc-800/80 rounded-xl p-2.5 text-center border border-zinc-700">
-          <div class="text-[10px] text-zinc-400 tracking-wider">MOR</div>
-          <div class="font-bold text-lg text-amber-400">${fmtNum(card.mor || 0)}</div>
-        </div>
-      </div>
-      <button onclick="window.hideCardModal()" class="w-full py-3 border border-white/30 hover:bg-white/5 rounded-2xl">닫기</button>
+      <button type="button" id="modal-close" class="btn-ghost btn-block">닫기</button>
     </div>
   `;
-
+  document.getElementById('modal-close').addEventListener('click', hideCardModal);
   modal.classList.remove('hidden');
-  modal.classList.add('flex');
+  modal.classList.add('open');
 }
 
 export function hideCardModal() {
   const modal = document.getElementById('card-modal');
-  if (modal) {
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-  }
+  if (!modal) return;
+  modal.classList.add('hidden');
+  modal.classList.remove('open');
 }
 
-// 전역에서도 접근 가능하게
 window.hideCardModal = hideCardModal;
-window.showCardModal = showCardModal;
 
 export function renderBattleLog() {
   const container = document.getElementById('battle-log');
-  container.innerHTML = '';
-
-  if (!gameState.battleLog || gameState.battleLog.length === 0) {
-    container.innerHTML = `<div class="text-zinc-500 text-sm">기록이 없습니다.</div>`;
+  container.replaceChildren();
+  if (!gameState.battleLog.length) {
+    container.textContent = '기록이 없습니다.';
     return;
   }
-
   gameState.battleLog.forEach((log) => {
-    const el = document.createElement('div');
-    el.className = `bg-zinc-950 border border-zinc-700 rounded-2xl p-3 flex items-center gap-3 hover:border-zinc-500 transition`;
-
-    const myWinClass = log.draw ? 'border-amber-400' : log.win ? 'border-emerald-500' : 'border-red-600';
-    const oppWinClass = log.draw ? 'border-amber-400' : log.win ? 'border-red-600' : 'border-emerald-500';
-
-    const myCardImg = document.createElement('div');
-    myCardImg.className = `w-14 h-14 rounded-xl overflow-hidden border-2 ${myWinClass} flex-shrink-0 cursor-pointer`;
-    myCardImg.style.backgroundImage = `url('${IMAGE_BASE}${log.myCard.id}.webp')`;
-    myCardImg.style.backgroundSize = 'cover';
-    myCardImg.style.backgroundPosition = 'center';
-    myCardImg.onclick = () => showCardModal(log.myCard);
-
-    const oppCardImg = document.createElement('div');
-    oppCardImg.className = `w-14 h-14 rounded-xl overflow-hidden border-2 ${oppWinClass} flex-shrink-0 cursor-pointer`;
-    oppCardImg.style.backgroundImage = `url('${IMAGE_BASE}${log.oppCard.id}.webp')`;
-    oppCardImg.style.backgroundSize = 'cover';
-    oppCardImg.style.backgroundPosition = 'center';
-    oppCardImg.onclick = () => showCardModal(log.oppCard);
-
-    el.innerHTML = `
-      <div class="text-xs text-zinc-500 w-10 text-center">#${log.battleNum}</div>
-      <div class="my-card-slot"></div>
-      <div class="flex-1 min-w-0">
-        <div class="font-bold text-sm truncate">${log.myCard.name}</div>
-        <div class="text-xs text-zinc-400">${log.myCard.grade} · <span class="text-amber-400">⚡ ${fmtNum(log.myCard.power)}</span></div>
-      </div>
-      <div class="px-3 text-center">
-        <div class="text-xs font-black ${log.draw ? 'text-amber-400' : log.win ? 'text-emerald-400' : 'text-red-400'}">
-          ${log.draw ? '무승부' : log.win ? 'WIN' : 'LOSE'}
-        </div>
-      </div>
-      <div class="flex-1 min-w-0 text-right">
-        <div class="font-bold text-sm truncate">${log.oppCard.name}</div>
-        <div class="text-xs text-zinc-400"><span class="text-amber-400">⚡ ${fmtNum(log.oppCard.power)}</span> · ${log.oppCard.grade}</div>
-      </div>
-      <div class="opp-card-slot"></div>
+    const row = document.createElement('div');
+    row.className = 'log-row';
+    const verdict = log.draw ? '무승부' : log.win ? 'WIN' : 'LOSE';
+    const tone = log.draw ? 'draw' : log.win ? 'win' : 'lose';
+    row.innerHTML = `
+      <span class="log-num">#${log.battleNum}</span>
+      <span class="log-face my"></span>
+      <span class="log-side">
+        <b>${esc(log.myCard.name)}</b>
+        <small>POWER ${fmtNum(log.myCard.power)}</small>
+      </span>
+      <span class="log-verdict ${tone}">${verdict}</span>
+      <span class="log-side right">
+        <b>${esc(log.oppCard.name)}</b>
+        <small>POWER ${fmtNum(log.oppCard.power)}</small>
+      </span>
+      <span class="log-face opp"></span>
     `;
-
-    el.querySelector('.my-card-slot').replaceWith(myCardImg);
-    el.querySelector('.opp-card-slot').replaceWith(oppCardImg);
-
-    container.appendChild(el);
+    const mine = row.querySelector('.log-face.my');
+    const opp = row.querySelector('.log-face.opp');
+    mine.innerHTML = cardImgHtml(log.myCard.id, { alt: log.myCard.name });
+    opp.innerHTML = cardImgHtml(log.oppCard.id, { alt: log.oppCard.name });
+    mine.addEventListener('click', () => showCardModal(log.myCard));
+    opp.addEventListener('click', () => showCardModal(log.oppCard));
+    container.appendChild(row);
   });
 }
 
-export function finishGame() {
-  showScreen('result-screen');
+function resultRecord() {
+  const byId = indexCards(cardPool);
+  gameState.battleLog.forEach((log) => {
+    byId.set(log.myCard.id, log.myCard);
+    byId.set(log.oppCard.id, log.oppCard);
+  });
+  const rounds = gameState.battleLog.map((log) => ({
+    myId: log.myCard.id,
+    oppId: log.oppCard.id,
+    myWin: !!log.win,
+    draw: !!log.draw
+  }));
+  const spot = pickSpotlight(rounds, byId);
+  return { spot };
+}
 
+export async function finishGame() {
+  showScreen('result-screen');
   const isWin = gameState.wins > gameState.loses;
   const finalText = document.getElementById('final-result-text');
+  if (gameState.wins === gameState.loses) finalText.innerHTML = '<span class="draw">DRAW</span>';
+  else if (isWin) finalText.innerHTML = '<span class="win">VICTORY</span>';
+  else finalText.innerHTML = '<span class="lose">DEFEAT</span>';
 
-  if (gameState.wins === gameState.loses) {
-    finalText.innerHTML = `<span class="text-amber-400">DRAW</span> 무승부`;
-  } else if (isWin) {
-    finalText.innerHTML = `YOUR <span class="text-emerald-400">VICTORY</span>`;
-  } else {
-    finalText.innerHTML = `CITY <span class="text-red-500">DEFEAT</span>`;
+  document.getElementById('final-score').textContent =
+    `${fmtNum(gameState.wins)}승 · ${fmtNum(gameState.loses)}패 · ${fmtNum(gameState.draws)}무`;
+
+  const { spot } = resultRecord();
+  const frame = document.getElementById('result-frame');
+  const hero = document.getElementById('result-hero');
+  if (spot.card && frame && hero) {
+    hero.hidden = false;
+    frame.innerHTML = cardImgHtml(spot.card.id, { full: true, alt: spot.card.name, eager: true, className: 'result-face' });
+    document.getElementById('result-kicker').textContent = spotlightLabel(spot);
+    document.getElementById('result-name').textContent = spot.card.name;
+    document.getElementById('result-power').textContent = `POWER ${fmtNum(spot.card.power)}`;
+  } else if (hero) {
+    hero.hidden = true;
   }
 
-  document.getElementById('final-score').innerText = `${fmtNum(gameState.wins)} WINS — ${fmtNum(gameState.loses)} LOSES — ${fmtNum(gameState.draws)} DRAWS`;
+  renderShareBar(document.getElementById('share-bar'), {
+    mode: gameState.mode,
+    wins: gameState.wins,
+    loses: gameState.loses,
+    draws: gameState.draws,
+    name: spot.card?.name || '',
+    power: spot.card?.power,
+    id: spot.card?.id || ''
+  });
+  renderChannels(document.getElementById('channels-result'));
   renderBattleLog();
+
+  const note = document.getElementById('rank-note');
+  if (note) note.textContent = '기록을 올리는 중…';
+  const posted = await submitRun(
+    gameState.mode,
+    gameState.battleLog.map((log) => ({ my: log.myCard.id, opp: log.oppCard.id }))
+  );
+  if (note) note.textContent = rankNote(posted);
+  rankMode = gameState.mode;
+}
+
+export async function showRankScreen(mode = rankMode) {
+  rankMode = MODE_DISTRIBUTION[mode] ? mode : resolvedDefaultMode();
+  showScreen('rank-screen');
+  const switcher = document.getElementById('rank-modes');
+  switcher.replaceChildren();
+  [5, 10, 20].forEach((value) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = value === rankMode ? 'is-on' : '';
+    button.textContent = `${value}장`;
+    button.addEventListener('click', () => showRankScreen(value));
+    switcher.appendChild(button);
+  });
+
+  const status = document.getElementById('rank-status');
+  const list = document.getElementById('rank-list');
+  status.textContent = '불러오는 중…';
+  list.replaceChildren();
+  const board = await fetchBoard(rankMode);
+  if (!board?.ok) {
+    status.textContent = '순위를 불러오지 못했습니다. 배틀은 그대로 할 수 있습니다.';
+    return;
+  }
+  const rows = board.top || [];
+  status.textContent = rows.length
+    ? '승패와 카드만 남습니다. 이름, 계정, 기기는 저장하지 않습니다.'
+    : '아직 이 길이의 기록이 없습니다. 배틀은 그대로 할 수 있습니다.';
+  rows.forEach((row, index) => {
+    const item = document.createElement('li');
+    item.className = 'rank-row';
+    const face = document.createElement('span');
+    face.className = 'rank-face';
+    if (row.heroineId) face.innerHTML = cardImgHtml(row.heroineId, { alt: row.heroineName || '' });
+    const copy = document.createElement('span');
+    copy.className = 'rank-copy';
+    const name = document.createElement('b');
+    name.textContent = row.heroineName || '기록';
+    const meta = document.createElement('small');
+    meta.textContent = `${row.wins}승 ${row.loses}패 ${row.draws}무 · 파워 차 +${fmtNum(row.margin)}`;
+    copy.append(name, meta);
+    const place = document.createElement('span');
+    place.className = 'rank-place';
+    place.textContent = String(index + 1);
+    item.append(place, face, copy);
+    list.appendChild(item);
+  });
 }

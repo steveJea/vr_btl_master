@@ -1,0 +1,33 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "vr-battle-masters-preview",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-11-19",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "logs": { "enabled": true, "head_sampling_rate": 1 },
+    "traces": { "enabled": true, "head_sampling_rate": 1 }
+  },
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": ["/", "/index.html", "/api/*"]
+  },
+  // Preview only. Do not add a route or custom domain for battle.mbbs.kr.
+  "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "vr-battle-preview-rank",
+      "database_id": "3d024acc-012f-4219-bb08-4359a9f0465a",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "RATE_LIMIT",
+      "id": "e7b89ef34944400c81c1d4df63c4c373"
+    }
+  ]
+}

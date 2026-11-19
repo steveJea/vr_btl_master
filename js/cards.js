@@ -1,24 +1,22 @@
-import { IMAGE_BASE, MODE_DISTRIBUTION } from './config.js';
-import { cardPool } from './data.js';
-import { shuffle, getGradeBorder, fmtNum } from './utils.js';
+import { CARD_FALLBACK, IMAGE_BASE, INCLUDE_MALE_CARDS, MODE_DISTRIBUTION, THUMB_BASE } from './config.js?v=7';
+import { cardPool } from './data.js?v=7';
+import { esc, fmtNum, getGradeClass, shuffle } from './utils.js?v=7';
 
 export function dealCards(mode) {
   const dist = MODE_DISTRIBUTION[mode];
   let dealt = [];
-  let avail = [...cardPool];
+  let avail = cardPool.filter((card) => INCLUDE_MALE_CARDS || card.gender !== 'MALE');
 
-  Object.keys(dist).forEach(gr => {
-    let need = dist[gr];
+  Object.keys(dist).forEach((grade) => {
+    const need = dist[grade];
     if (!need) return;
-
-    let pool = shuffle(avail.filter(c => c.grade === gr));
-    for (let i = 0; i < Math.min(need, pool.length); i++) {
+    const pool = shuffle(avail.filter((card) => card.grade === grade));
+    for (let i = 0; i < Math.min(need, pool.length); i += 1) {
       dealt.push({ ...pool[i] });
-      avail = avail.filter(c => c.id !== pool[i].id);
+      avail = avail.filter((card) => card.id !== pool[i].id);
     }
   });
 
-  // 부족하면 랜덤 채우기
   while (dealt.length < mode && avail.length) {
     const idx = Math.floor(Math.random() * avail.length);
     dealt.push({ ...avail[idx] });
@@ -28,43 +26,65 @@ export function dealCards(mode) {
   return shuffle(dealt);
 }
 
-export function createCardElement(card, onClick = null) {
-  const el = document.createElement('div');
-  el.className = `card bg-zinc-900 border-2 ${getGradeBorder(card.grade)} rounded-2xl overflow-hidden cursor-pointer`;
-  const imgSrc = `${IMAGE_BASE}${card.id}.webp`;
-  const placeholder = `https://picsum.photos/id/${(parseInt(card.id) % 200) + 29}/300/380`;
+export function onCardImgError(img) {
+  if (!img || img.dataset.step === 'fb') return;
+  if (img.dataset.full === '1' && img.dataset.step !== 'th' && img.dataset.thumb) {
+    img.dataset.step = 'th';
+    img.src = img.dataset.thumb;
+    return;
+  }
+  img.dataset.step = 'fb';
+  img.src = img.dataset.fallback || CARD_FALLBACK;
+}
 
+if (typeof window !== 'undefined') window.onCardImgError = onCardImgError;
+
+export function cardImgHtml(id, { full = false, alt = '', className = '', eager = false } = {}) {
+  const thumb = `${THUMB_BASE}${id}.webp`;
+  const art = `${IMAGE_BASE}${id}.webp`;
+  const src = full ? art : thumb;
+  return `<img class="${className}" src="${esc(src)}" alt="${esc(alt)}" data-full="${full ? '1' : '0'}" data-thumb="${esc(thumb)}" data-fallback="${esc(CARD_FALLBACK)}" width="300" height="400" decoding="async" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} onerror="window.onCardImgError(this)">`;
+}
+
+export function createCardElement(card, onClick = null) {
+  const el = document.createElement('article');
+  el.className = `card ${getGradeClass(card.grade)}`;
   el.innerHTML = `
-    <div class="relative">
-      <img src="${imgSrc}" class="w-full h-44 object-cover" onerror="this.src='${placeholder}'">
-      <div class="absolute top-2 right-2 px-2.5 py-0.5 text-[10px] font-bold bg-black/70 rounded border border-white/20">
-        ${card.grade}
-      </div>
+    <div class="card-art">
+      ${cardImgHtml(card.id, { alt: card.name })}
+      <span class="grade-pill">${esc(card.grade)}</span>
     </div>
-    <div class="p-3">
-      <div class="font-bold text-lg leading-tight">${card.name}</div>
-      <div class="text-xs text-zinc-400 mt-0.5">${card.age}세 • ${card.region}</div>
-      <div class="card-power text-sm font-black text-amber-400 mt-1">⚡ ${fmtNum(card.power)}</div>
+    <div class="card-body">
+      <div class="card-name">${esc(card.name)}</div>
+      <div class="card-meta">${esc(card.region)}</div>
+      <div class="card-power">POWER ${fmtNum(card.power)}</div>
     </div>
   `;
-
   if (onClick) {
-    el.onclick = () => onClick(card);
+    el.tabIndex = 0;
+    el.setAttribute('role', 'button');
+    el.addEventListener('click', () => onClick(card));
+    el.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        onClick(card);
+      }
+    });
   }
   return el;
 }
 
 export function renderVsCard(containerId, card) {
   const container = document.getElementById(containerId);
-  const imgSrc = `${IMAGE_BASE}${card.id}.webp`;
+  if (!container) return;
   container.innerHTML = `
-    <div class="relative">
-      <img src="${imgSrc}" class="w-full h-52 object-cover" onerror="this.src='https://picsum.photos/id/29/300/380'">
-      <div class="absolute top-2 right-2 px-2.5 py-0.5 text-xs font-bold bg-black/70 rounded">${card.grade}</div>
-      <div class="p-3 bg-zinc-900">
-        <div class="font-bold text-lg">${card.name}</div>
-        <div class="text-xs text-zinc-400 mt-0.5">${card.class} • ${card.region}</div>
-        <div class="card-power text-base font-black text-amber-400 mt-1">⚡ POWER ${fmtNum(card.power)}</div>
+    <div class="vs-card ${getGradeClass(card.grade)}">
+      <div class="vs-art">${cardImgHtml(card.id, { full: true, alt: card.name, eager: true })}</div>
+      <div class="vs-meta">
+        <div class="grade-pill">${esc(card.grade)}</div>
+        <div class="card-name">${esc(card.name)}</div>
+        <div class="card-meta">${esc(card.class)} · ${esc(card.region)}</div>
+        <div class="card-power">POWER ${fmtNum(card.power)}</div>
       </div>
     </div>
   `;
