@@ -1,71 +1,78 @@
-import { IMAGE_BASE, MODE_DISTRIBUTION } from './config.js';
+import { IMAGE_BASE, FALLBACK_ART, MODE_DISTRIBUTION } from './config.js';
 import { cardPool } from './data.js';
-import { shuffle, getGradeBorder, fmtNum } from './utils.js';
+import { shuffle, gradeClass, fmtNum, esc, safeId } from './utils.js';
+
+export function cardArtUrl(id) {
+  const safe = safeId(id);
+  return safe ? `${IMAGE_BASE}${safe}.webp` : FALLBACK_ART;
+}
+
+export function mountCardImage(img, card, { eager = false } = {}) {
+  img.alt = card?.name ? `${card.name} 초상` : '카드 초상';
+  img.decoding = 'async';
+  img.loading = eager ? 'eager' : 'lazy';
+  img.src = cardArtUrl(card?.id);
+  img.addEventListener('error', () => {
+    img.src = FALLBACK_ART;
+  }, { once: true });
+}
 
 export function dealCards(mode) {
   const dist = MODE_DISTRIBUTION[mode];
-  let dealt = [];
+  const dealt = [];
   let avail = [...cardPool];
 
-  Object.keys(dist).forEach(gr => {
-    let need = dist[gr];
+  Object.keys(dist).forEach((grade) => {
+    const need = dist[grade];
     if (!need) return;
-
-    let pool = shuffle(avail.filter(c => c.grade === gr));
-    for (let i = 0; i < Math.min(need, pool.length); i++) {
+    const pool = shuffle(avail.filter((card) => card.grade === grade));
+    for (let i = 0; i < Math.min(need, pool.length); i += 1) {
       dealt.push({ ...pool[i] });
-      avail = avail.filter(c => c.id !== pool[i].id);
+      avail = avail.filter((card) => card.id !== pool[i].id);
     }
   });
 
-  // 부족하면 랜덤 채우기
   while (dealt.length < mode && avail.length) {
-    const idx = Math.floor(Math.random() * avail.length);
-    dealt.push({ ...avail[idx] });
-    avail.splice(idx, 1);
+    const index = Math.floor(Math.random() * avail.length);
+    dealt.push({ ...avail[index] });
+    avail.splice(index, 1);
   }
 
   return shuffle(dealt);
 }
 
 export function createCardElement(card, onClick = null) {
-  const el = document.createElement('div');
-  el.className = `card bg-zinc-900 border-2 ${getGradeBorder(card.grade)} rounded-2xl overflow-hidden cursor-pointer`;
-  const imgSrc = `${IMAGE_BASE}${card.id}.webp`;
-  const placeholder = `https://picsum.photos/id/${(parseInt(card.id) % 200) + 29}/300/380`;
-
+  const el = document.createElement('button');
+  el.type = 'button';
+  el.className = `card ${gradeClass(card.grade)}`;
   el.innerHTML = `
-    <div class="relative">
-      <img src="${imgSrc}" class="w-full h-44 object-cover" onerror="this.src='${placeholder}'">
-      <div class="absolute top-2 right-2 px-2.5 py-0.5 text-[10px] font-bold bg-black/70 rounded border border-white/20">
-        ${card.grade}
-      </div>
+    <div class="card-art">
+      <img alt="">
+      <span class="grade-pill">${esc(card.grade)}</span>
     </div>
-    <div class="p-3">
-      <div class="font-bold text-lg leading-tight">${card.name}</div>
-      <div class="text-xs text-zinc-400 mt-0.5">${card.age}세 • ${card.region}</div>
-      <div class="card-power text-sm font-black text-amber-400 mt-1">⚡ ${fmtNum(card.power)}</div>
+    <div class="card-body">
+      <div class="card-name">${esc(card.name)}</div>
+      <div class="card-meta">${esc(card.region)}</div>
+      <div class="card-power">POWER ${fmtNum(card.power)}</div>
     </div>
   `;
-
-  if (onClick) {
-    el.onclick = () => onClick(card);
-  }
+  mountCardImage(el.querySelector('img'), card);
+  if (onClick) el.addEventListener('click', () => onClick(card));
   return el;
 }
 
 export function renderVsCard(containerId, card) {
   const container = document.getElementById(containerId);
-  const imgSrc = `${IMAGE_BASE}${card.id}.webp`;
   container.innerHTML = `
-    <div class="relative">
-      <img src="${imgSrc}" class="w-full h-52 object-cover" onerror="this.src='https://picsum.photos/id/29/300/380'">
-      <div class="absolute top-2 right-2 px-2.5 py-0.5 text-xs font-bold bg-black/70 rounded">${card.grade}</div>
-      <div class="p-3 bg-zinc-900">
-        <div class="font-bold text-lg">${card.name}</div>
-        <div class="text-xs text-zinc-400 mt-0.5">${card.class} • ${card.region}</div>
-        <div class="card-power text-base font-black text-amber-400 mt-1">⚡ POWER ${fmtNum(card.power)}</div>
+    <div class="vs-card ${gradeClass(card.grade)}">
+      <div class="vs-art"><img alt=""></div>
+      <div class="vs-body">
+        <div class="grade-pill">${esc(card.grade)}</div>
+        <div class="card-name">${esc(card.name)}</div>
+        <div class="card-meta">${esc(card.class)} · ${esc(card.region)}</div>
+        <div class="card-power">POWER ${fmtNum(card.power)}</div>
       </div>
     </div>
   `;
+  mountCardImage(container.querySelector('img'), card, { eager: true });
 }

@@ -2,40 +2,229 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VR Battle Masters | 배틀 마스터 - 카드 파워 배틀</title>
-  <!-- SEO -->
-  <meta name="description" content="Violence Royale 캐릭터 카드로 덱을 짜고 POWER로 승부하는 카드 배틀 게임. 카드의 힘으로 잔혹한 도시를 지배하고, 배틀 기록을 쌓아 최강의 배틀 마스터에 도전하세요. 무료 웹게임.">
-  <meta name="keywords" content="VR Battle Masters, 배틀 마스터, 카드 배틀, 카드 게임, 덱 빌딩, 무료 웹게임, Violence Royale">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>VR Battle Masters | VR 카드 배틀 맛보기</title>
+  <meta name="description" content="VR Battle Masters. VR 세계의 문을 먼저 열어 보는 짧은 카드 배틀. 덱을 고르고 POWER로 승부한 뒤, 결과를 공유하고 이름 없는 순위에 남길 수 있습니다.">
   <meta name="robots" content="index,follow">
-  <meta name="theme-color" content="#0b0b12">
+  <meta name="theme-color" content="#09080d">
   <link rel="canonical" href="https://battle.mbbs.kr/">
+  <link rel="icon" href="favicon.png">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="VR Battle Masters">
   <meta property="og:locale" content="ko_KR">
-  <meta property="og:title" content="VR Battle Masters | 배틀 마스터 - 카드 파워 배틀">
-  <meta property="og:description" content="Violence Royale 캐릭터 카드로 덱을 짜고 POWER로 승부하는 카드 배틀 게임. 카드의 힘으로 잔혹한 도시를 지배하고, 배틀 기록을 쌓아 최강의 배틀 마스터에 도전하세요. 무료 웹게임.">
+  <meta property="og:title" content="VR Battle Masters | VR 카드 배틀 맛보기">
+  <meta property="og:description" content="VR 세계의 문을 먼저 열어 보는 짧은 카드 배틀. POWER로 승부하고, 히로인과 결과를 공유하세요.">
   <meta property="og:url" content="https://battle.mbbs.kr/">
   <meta property="og:image" content="https://battle.mbbs.kr/img/og.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="VR Battle Masters | 배틀 마스터 - 카드 파워 배틀">
-  <meta name="twitter:description" content="Violence Royale 캐릭터 카드로 덱을 짜고 POWER로 승부하는 카드 배틀 게임. 카드의 힘으로 잔혹한 도시를 지배하고, 배틀 기록을 쌓아 최강의 배틀 마스터에 도전하세요. 무료 웹게임.">
+  <meta name="twitter:title" content="VR Battle Masters | VR 카드 배틀 맛보기">
+  <meta name="twitter:description" content="VR 세계의 문을 먼저 열어 보는 짧은 카드 배틀. POWER로 승부하고, 히로인과 결과를 공유하세요.">
   <meta name="twitter:image" content="https://battle.mbbs.kr/img/og.jpg">
-  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "VideoGame", "name": "VR Battle Masters", "description": "Violence Royale 캐릭터 카드로 덱을 짜고 POWER로 승부하는 카드 배틀 게임. 카드의 힘으로 잔혹한 도시를 지배하고, 배틀 기록을 쌓아 최강의 배틀 마스터에 도전하세요. 무료 웹게임.", "url": "https://battle.mbbs.kr/", "image": "https://battle.mbbs.kr/img/og.jpg", "inLanguage": "ko", "genre": "CardGame", "gamePlatform": ["Web browser", "PC", "Mobile"], "applicationCategory": "Game", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "KRW"}}</script>
-  
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="./css/style.css">
-  
+  <link rel="preload" href="fonts/anton-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="VR Battle Masters 처음 화면">
+      <span class="brand-mark">VR</span>
+      <span>
+        <strong>VR</strong>
+        <small>BATTLE MASTERS</small>
+      </span>
+    </a>
+    <div class="top-actions">
+      <button type="button" id="mute-btn" class="icon-btn" aria-pressed="false">
+        <span class="sr">소리 끄기</span>
+      </button>
+      <button type="button" id="home-btn" class="icon-btn home-btn">홈</button>
+    </div>
+  </header>
 
-  <!-- Google Analytics -->
+  <main>
+    <section id="main-screen" class="section screen-title">
+      <div class="hero-frame">
+        <picture>
+          <source srcset="img/hero.webp" type="image/webp">
+          <img src="img/main.jpg" alt="비 오는 거리의 VR 캐릭터들" width="1080" height="608" fetchpriority="high">
+        </picture>
+        <div class="hero-shade"></div>
+      </div>
+      <div class="title-copy">
+        <p class="kicker">CARD BATTLE TEASER</p>
+        <h1>VR<br>BATTLE MASTERS</h1>
+        <p class="lede">본편이 열리기 전, VR 세계의 문을 먼저 두드려 보는 짧은 카드 배틀입니다.</p>
+        <ol class="howto">
+          <li><span>1</span><p>짧은 덱을 받습니다. 세 번까지 다시 뽑을 수 있습니다.</p></li>
+          <li><span>2</span><p>카드를 한 장씩 냅니다. POWER가 높은 쪽이 이깁니다.</p></li>
+          <li><span>3</span><p>히로인과 전적을 공유하고, 이름 없는 순위에 남깁니다.</p></li>
+        </ol>
+        <button type="button" id="start-btn" class="btn btn-start">배틀 시작 <em id="start-mode-label">5라운드</em></button>
+        <div class="title-links">
+          <button type="button" id="mode-link" class="text-link">라운드 수 고르기</button>
+          <button type="button" id="rank-link" class="text-link">순위 보기</button>
+        </div>
+        <div id="title-channels" class="channel-row" hidden></div>
+      </div>
+    </section>
+
+    <section id="choice-screen" class="section screen-choice">
+      <p class="kicker">ROUND LENGTH</p>
+      <h2>얼마나 짧게 둘까요</h2>
+      <div class="mode-grid">
+        <button type="button" class="mode-card" data-mode-card="5">
+          <span class="mode-flag">기본</span>
+          <strong>5 VS 5</strong>
+          <span>짧은 맛보기</span>
+          <ul>
+            <li>NORMAL 2</li><li>RARE 1</li><li>HIGH RARE 1</li><li>ULTRA RARE 1</li>
+          </ul>
+        </button>
+        <button type="button" class="mode-card" data-mode-card="10">
+          <span class="mode-flag">기본</span>
+          <strong>10 VS 10</strong>
+          <span>한 판 더</span>
+          <ul>
+            <li>NORMAL 5</li><li>RARE 2</li><li>HIGH RARE 1</li><li>SUPER RARE 1</li><li>ULTRA RARE 1</li>
+          </ul>
+        </button>
+        <button type="button" class="mode-card" data-mode-card="20">
+          <span class="mode-flag">기본</span>
+          <strong>20 VS 20</strong>
+          <span>긴 배틀</span>
+          <ul>
+            <li>NORMAL 10</li><li>RARE 4</li><li>HIGH RARE 2</li><li>SUPER RARE 2</li><li>ULTRA RARE 1</li><li>MYTHIC RARE 1</li>
+          </ul>
+        </button>
+      </div>
+    </section>
+
+    <section id="deck-screen" class="section screen-deck">
+      <div class="deck-head">
+        <div>
+          <p class="kicker">YOUR DECK</p>
+          <h2><span id="mode-badge">5 VS 5</span> <small id="mode-blurb"></small></h2>
+        </div>
+        <div class="deck-actions">
+          <button type="button" id="change-btn" class="btn btn-ghost">덱 바꾸기 <span id="change-count">3/3</span></button>
+          <button type="button" id="confirm-btn" class="btn btn-start">이 덱으로 배틀</button>
+        </div>
+      </div>
+      <div id="deck-grid" class="deck-grid"></div>
+    </section>
+
+    <section id="battle-screen" class="section screen-battle">
+      <div class="battle-head">
+        <div>
+          <p class="kicker">BATTLE</p>
+          <div id="battle-progress" class="progress">01 / 05</div>
+        </div>
+        <div class="score-pills" aria-live="polite">
+          <span class="win">승 <b id="win-count">0</b></span>
+          <span class="lose">패 <b id="lose-count">0</b></span>
+          <span class="draw">무 <b id="draw-count">0</b></span>
+        </div>
+      </div>
+
+      <div class="lane">
+        <div class="lane-label">상대</div>
+        <div class="lane-row">
+          <div id="opp-used" class="used-row"></div>
+          <div id="opp-remaining" class="back-row"></div>
+        </div>
+      </div>
+
+      <div id="vs-zone" class="vs-zone">
+        <div id="vs-idle" class="vs-idle">
+          <p>아래 손패에서 카드를 고르세요.</p>
+        </div>
+        <div id="vs-countdown" class="vs-countdown hidden">
+          <div id="countdown-num">3</div>
+        </div>
+        <div id="vs-battle" class="vs-battle hidden">
+          <div class="vs-pair">
+            <div>
+              <div class="side-label mine">내 카드</div>
+              <div id="vs-my-card"></div>
+            </div>
+            <div class="vs-word">VS</div>
+            <div>
+              <div class="side-label opp">상대</div>
+              <div id="vs-opp-card"></div>
+            </div>
+          </div>
+          <div id="battle-result-stamp" class="stamp-wrap hidden">
+            <div id="result-text" class="stamp"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hand-head">
+        <span>내 손패</span>
+        <span id="hand-count"></span>
+      </div>
+      <div id="my-hand" class="hand-row"></div>
+      <div class="lane compact">
+        <div class="lane-label">내가 낸 카드</div>
+        <div id="my-used" class="used-row"></div>
+      </div>
+    </section>
+
+    <section id="result-screen" class="section screen-result">
+      <article id="heroine-card" class="heroine-card">
+        <img id="heroine-img" alt="이번 판을 대표하는 캐릭터">
+        <div class="heroine-copy">
+          <p id="heroine-kicker" class="kicker">이번 판의 히로인</p>
+          <h2 id="heroine-name"></h2>
+          <p id="heroine-meta"></p>
+        </div>
+      </article>
+      <p id="final-kicker" class="kicker center">VICTORY</p>
+      <h2 id="final-result-text" class="result-title"></h2>
+      <p id="final-score" class="final-score"></p>
+
+      <div id="share-box" class="share-box"></div>
+      <div id="result-channels" class="channel-row" hidden></div>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h3>이름 없는 순위</h3>
+          <button type="button" id="rank-from-result" class="text-link">전체 순위</button>
+        </div>
+        <p id="your-rank" class="your-rank" hidden></p>
+        <div id="result-board"></div>
+        <p class="fine">승수만 비교합니다. 플레이어 이름, 계정, 기기를 묻지 않습니다.</p>
+      </section>
+
+      <section class="panel">
+        <h3>배틀 기록</h3>
+        <div id="battle-log"></div>
+      </section>
+
+      <button type="button" id="again-btn" class="btn btn-start">한 판 더</button>
+    </section>
+
+    <section id="ranking-screen" class="section screen-rank">
+      <p class="kicker">GLOBAL BOARD</p>
+      <h2>이름 없는 순위</h2>
+      <p id="rank-note" class="lede"></p>
+      <div id="rank-tabs" class="rank-tabs">
+        <button type="button" data-rank-mode="5">5</button>
+        <button type="button" data-rank-mode="10">10</button>
+        <button type="button" data-rank-mode="20">20</button>
+      </div>
+      <div id="rank-list" class="panel"></div>
+      <button type="button" id="home-from-rank" class="btn btn-ghost btn-block">타이틀로</button>
+    </section>
+  </main>
+
+  <div id="card-modal" class="modal hidden">
+    <div class="modal-card" id="modal-content" role="dialog" aria-modal="true" aria-label="카드 정보"></div>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+  <script src="js/footer.js" data-current="battle" data-mode="flow" data-show="#main-screen,#choice-screen,#result-screen,#ranking-screen"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-NP3VPPBRKL"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
@@ -43,226 +232,5 @@
     gtag('js', new Date());
     gtag('config', 'G-NP3VPPBRKL');
   </script>
-</head>
-<body class="bg-zinc-950 text-white game-bg min-h-screen">
-
-  <!-- Header -->
-  <div class="border-b border-zinc-800 bg-black/70 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-red-600 rounded-lg flex items-center justify-center">
-          <i class="fa-solid fa-skull"></i>
-        </div>
-        <div>
-          <div class="title-font text-xl tracking-wider">VIOLENCE ROYALE</div>
-          <div class="text-[10px] text-red-500 -mt-1 tracking-widest">THE BRUTAL CITY</div>
-        </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <button id="mute-btn" onclick="toggleMuteBtn()" class="text-sm px-3 py-1.5 hover:bg-zinc-800 rounded-lg" title="음소거">
-          <i class="fa-solid fa-volume-high"></i>
-        </button>
-        <button onclick="restartGame()" class="text-sm px-4 py-1.5 hover:bg-zinc-800 rounded-lg flex items-center gap-2">
-          <i class="fa-solid fa-home text-red-500"></i> HOME
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MAIN SCREEN -->
-  <div id="main-screen" class="section active min-h-[calc(100vh-60px)] flex items-center justify-center">
-    <div class="text-center px-6 max-w-3xl mx-auto">
-      <div class="mb-8">
-        <div class="mb-6 rounded-2xl overflow-hidden border border-zinc-700 shadow-2xl max-w-lg mx-auto">
-          <video 
-            id="main-video"
-            autoplay 
-            muted 
-            loop 
-            playsinline
-            class="w-full aspect-video object-cover bg-black">
-            <source src="https://raw.githubusercontent.com/steveJea/vr_btl_master/main/bm_main.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-        </div>
-        <h1 class="title-font text-7xl md:text-8xl leading-none tracking-tight">
-          <span class="bg-gradient-to-r from-red-500 to-red-600 bg-clip-text text-transparent">VIOLENCE</span><br>
-          <span>ROYALE</span>
-        </h1>
-        <div class="text-red-500 text-2xl tracking-[6px] font-bold mt-1">THE BRUTAL CITY</div>
-        <div class="text-4xl title-font tracking-widest mt-1 text-white/90">BATTLE MASTERS</div>
-      </div>
-      <p class="text-zinc-400 mb-10">카드의 힘으로 잔혹한 도시를 지배하라.<br>POWER가 모든 것을 결정한다.</p>
-      <button onclick="startGame()" class="px-14 py-4 bg-red-600 hover:bg-red-500 text-xl font-bold rounded-2xl shadow-xl">
-        PRESS ANY KEY TO START
-      </button>
-    </div>
-  </div>
-
-  <!-- CHOICE SCREEN -->
-  <div id="choice-screen" class="section min-h-[calc(100vh-60px)] flex items-center justify-center py-12">
-    <div class="max-w-5xl w-full px-6 mx-auto">
-      <div class="text-center mb-10">
-        <div class="text-red-500 text-sm tracking-[3px] font-bold mb-1">SELECT GAME MODE</div>
-        <h2 class="title-font text-5xl md:text-6xl">게임 방식을 선택하세요</h2>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div onclick="selectGameMode(5)" class="cursor-pointer bg-zinc-900 border border-zinc-700 hover:border-red-500 rounded-3xl p-7 transition">
-          <div class="text-6xl font-black title-font">5 VS 5</div>
-          <div class="mt-5 text-sm space-y-2 text-zinc-300">
-            <div class="flex justify-between"><span>NORMAL</span><span class="font-mono">2</span></div>
-            <div class="flex justify-between"><span>RARE</span><span class="font-mono">1</span></div>
-            <div class="flex justify-between"><span>HIGH RARE</span><span class="font-mono">1</span></div>
-            <div class="flex justify-between"><span>ULTRA RARE</span><span class="font-mono">1</span></div>
-          </div>
-        </div>
-        <div onclick="selectGameMode(10)" class="cursor-pointer bg-zinc-900 border border-zinc-700 hover:border-red-500 rounded-3xl p-7 transition relative">
-          <div class="absolute -top-2 -right-2 bg-red-600 text-xs px-3 py-0.5 rounded font-bold">RECOMMENDED</div>
-          <div class="text-6xl font-black title-font">10 VS 10</div>
-          <div class="mt-5 text-sm space-y-2 text-zinc-300">
-            <div class="flex justify-between"><span>NORMAL</span><span class="font-mono">5</span></div>
-            <div class="flex justify-between"><span>RARE</span><span class="font-mono">2</span></div>
-            <div class="flex justify-between"><span>HIGH RARE</span><span class="font-mono">1</span></div>
-            <div class="flex justify-between"><span>SUPER RARE</span><span class="font-mono">1</span></div>
-            <div class="flex justify-between"><span>ULTRA RARE</span><span class="font-mono">1</span></div>
-          </div>
-        </div>
-        <div onclick="selectGameMode(20)" class="cursor-pointer bg-zinc-900 border border-zinc-700 hover:border-red-500 rounded-3xl p-7 transition">
-          <div class="text-6xl font-black title-font">20 VS 20</div>
-          <div class="mt-5 text-sm space-y-2 text-zinc-300">
-            <div class="flex justify-between"><span>NORMAL</span><span class="font-mono">10</span></div>
-            <div class="flex justify-between"><span>RARE</span><span class="font-mono">4</span></div>
-            <div class="flex justify-between"><span>HIGH RARE</span><span class="font-mono">2</span></div>
-            <div class="flex justify-between"><span>SUPER RARE</span><span class="font-mono">2</span></div>
-            <div class="flex justify-between"><span>ULTRA RARE</span><span class="font-mono">1</span></div>
-            <div class="flex justify-between"><span class="text-red-400">MYTHIC RARE</span><span class="font-mono">1</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DECK SCREEN -->
-  <div id="deck-screen" class="section py-8">
-    <div class="max-w-7xl mx-auto px-6">
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-        <div>
-          <span class="px-4 py-1 bg-red-600 text-xs font-bold tracking-widest rounded">DECK PREPARATION</span>
-          <span id="mode-badge" class="text-2xl font-bold ml-3"></span>
-        </div>
-        <div class="flex gap-3">
-          <button onclick="changeDeck()" id="change-btn" class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded-xl text-sm font-semibold disabled:opacity-40">
-            덱 변경 <span id="change-count">3/3</span>
-          </button>
-          <button onclick="confirmDeck()" class="px-7 py-2.5 bg-red-600 hover:bg-red-500 rounded-xl font-bold">
-            덱 확인 및 배틀 시작
-          </button>
-        </div>
-      </div>
-      <div id="deck-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"></div>
-    </div>
-  </div>
-
-  <!-- BATTLE SCREEN -->
-  <div id="battle-screen" class="section py-6">
-    <div class="max-w-6xl mx-auto px-5">
-      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-        <div>
-          <div class="text-xs text-red-500 font-bold tracking-wider">BATTLE IN PROGRESS</div>
-          <div id="battle-progress" class="text-3xl font-black title-font">01 / 05</div>
-        </div>
-        <div class="flex gap-6 bg-zinc-900 border border-zinc-700 px-5 py-2 rounded-2xl text-sm">
-          <div><span class="text-emerald-400 font-bold">WIN</span> <span id="win-count" class="font-mono text-2xl font-bold ml-1">0</span></div>
-          <div><span class="text-red-400 font-bold">LOSE</span> <span id="lose-count" class="font-mono text-2xl font-bold ml-1">0</span></div>
-          <div><span class="text-amber-400 font-bold">DRAW</span> <span id="draw-count" class="font-mono text-2xl font-bold ml-1">0</span></div>
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <div class="flex items-center gap-2 text-red-400 text-sm mb-1">
-          <i class="fa-solid fa-user-secret"></i>
-          <span class="font-bold">OPPONENT</span>
-        </div>
-        <div class="flex gap-2 items-end">
-          <div id="opp-used" class="flex gap-1.5 flex-wrap min-h-[52px] pr-3 border-r border-zinc-700"></div>
-          <div id="opp-remaining" class="flex gap-1.5 overflow-x-auto flex-1"></div>
-        </div>
-      </div>
-
-      <div id="vs-zone" class="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 mb-4 min-h-[300px] flex items-center justify-center">
-        <div id="vs-idle" class="text-center">
-          <div class="w-14 h-14 bg-zinc-800 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-zinc-600">
-            <i class="fa-solid fa-question text-3xl text-zinc-500"></i>
-          </div>
-          <p class="text-zinc-400">아래에서 카드를 선택하여 배틀을 시작하세요</p>
-        </div>
-        <div id="vs-countdown" class="hidden text-center">
-          <div id="countdown-num" class="text-8xl font-black title-font text-red-500">3</div>
-        </div>
-        <div id="vs-battle" class="hidden w-full">
-          <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10">
-            <div class="w-48">
-              <div class="text-emerald-400 text-xs font-bold mb-1 text-center">YOUR CARD</div>
-              <div id="vs-my-card" class="rounded-2xl overflow-hidden border-2 border-emerald-500"></div>
-            </div>
-            <div class="text-5xl font-black title-font text-white/60">VS</div>
-            <div class="w-48">
-              <div class="text-red-400 text-xs font-bold mb-1 text-center">OPPONENT</div>
-              <div id="vs-opp-card" class="rounded-2xl overflow-hidden border-2 border-red-500"></div>
-            </div>
-          </div>
-          <div id="battle-result-stamp" class="hidden text-center mt-6">
-            <div id="result-text" class="text-5xl font-black tracking-widest"></div>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div class="flex justify-between items-center mb-2">
-          <span class="font-bold text-emerald-400">YOUR HAND</span>
-          <span id="hand-count" class="text-xs text-emerald-300/70"></span>
-        </div>
-        <div id="my-hand" class="flex gap-3 overflow-x-auto pb-3"></div>
-      </div>
-
-      <div class="mt-4">
-        <div class="text-xs text-zinc-500 mb-1">USED CARDS (ME)</div>
-        <div id="my-used" class="flex gap-1.5 flex-wrap min-h-[48px]"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- RESULT SCREEN -->
-  <div id="result-screen" class="section py-10">
-    <div class="max-w-4xl mx-auto px-6">
-      <div class="text-center mb-8">
-        <div id="final-result-text" class="text-6xl md:text-7xl font-black title-font mb-2"></div>
-        <div id="final-score" class="text-2xl font-mono text-zinc-300"></div>
-      </div>
-
-      <div class="bg-zinc-900 border border-zinc-700 rounded-3xl p-6 mb-8">
-        <div class="font-bold text-lg mb-4 px-1">배틀 기록</div>
-        <div id="battle-log" class="space-y-3"></div>
-      </div>
-
-      <div class="text-center">
-        <button onclick="location.reload();" class="px-10 py-4 bg-white text-black font-bold rounded-2xl">
-          메인으로 돌아가기
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Card Modal -->
-  <div id="card-modal" class="hidden fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4" onclick="if(event.target.id==='card-modal')hideCardModal()">
-    <div class="bg-zinc-900 border border-zinc-700 rounded-3xl max-w-md w-full overflow-hidden" onclick="event.stopPropagation()">
-      <div id="modal-content"></div>
-    </div>
-  </div>
-
-
-  <!-- Main Module -->
-  <script type="module" src="./js/main.js"></script>
-<script src="js/footer.js" data-current="battle" data-mode="flow" data-show="#main-screen,#choice-screen,#deck-screen,#result-screen"></script>
 </body>
 </html>

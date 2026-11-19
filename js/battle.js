@@ -5,42 +5,37 @@ import {
   renderMyHand,
   renderOppRemaining,
   renderUsedCards,
-  finishGame
+  finishGame,
 } from './ui.js';
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export async function deploySelectedCard() {
   if (!gameState.selectedCardId || gameState.isBattling) return;
 
-  const myCard = gameState.remainingPlayer.find(c => c.id === gameState.selectedCardId);
-  if (!myCard) return;
+  const myCard = gameState.remainingPlayer.find((card) => card.id === gameState.selectedCardId);
+  if (!myCard || gameState.remainingOpp.length === 0) return;
 
   document.getElementById('deploy-bar')?.remove();
   gameState.isBattling = true;
-  gameState.remainingPlayer = gameState.remainingPlayer.filter(c => c.id !== myCard.id);
+  gameState.remainingPlayer = gameState.remainingPlayer.filter((card) => card.id !== myCard.id);
   renderMyHand();
 
-  if (gameState.remainingOpp.length === 0) {
-    gameState.isBattling = false;
-    return;
-  }
+  const oppIndex = Math.floor(Math.random() * gameState.remainingOpp.length);
+  const oppCard = gameState.remainingOpp.splice(oppIndex, 1)[0];
 
-  const oppCard = gameState.remainingOpp.splice(
-    Math.floor(Math.random() * gameState.remainingOpp.length),
-    1
-  )[0];
-
-  // Countdown
   document.getElementById('vs-idle').classList.add('hidden');
   document.getElementById('vs-countdown').classList.remove('hidden');
   document.getElementById('vs-battle').classList.add('hidden');
 
   const numEl = document.getElementById('countdown-num');
-  for (let i = 3; i >= 1; i--) {
-    numEl.innerText = i;
-    await new Promise(r => setTimeout(r, 600));
+  for (let i = 3; i >= 1; i -= 1) {
+    numEl.textContent = String(i);
+    await wait(450);
   }
 
-  // Show VS
   document.getElementById('vs-countdown').classList.add('hidden');
   document.getElementById('vs-battle').classList.remove('hidden');
   renderVsCard('vs-my-card', myCard);
@@ -53,43 +48,43 @@ export async function deploySelectedCard() {
   stamp.classList.remove('hidden');
 
   if (isDraw) {
-    resultText.innerHTML = `<span class="text-amber-400">무승부</span>`;
-    gameState.draws++;
+    resultText.textContent = '무승부';
+    resultText.className = 'stamp draw';
+    gameState.draws += 1;
   } else if (myWin) {
-    resultText.innerHTML = `<span class="text-emerald-400">WIN</span>`;
+    resultText.textContent = 'WIN';
+    resultText.className = 'stamp win';
     document.getElementById('vs-my-card').classList.add('gold-glow');
     document.getElementById('vs-opp-card').classList.add('cracked');
-    gameState.wins++;
+    gameState.wins += 1;
   } else {
-    resultText.innerHTML = `<span class="text-red-500">LOSE</span>`;
+    resultText.textContent = 'LOSE';
+    resultText.className = 'stamp lose';
     document.getElementById('vs-my-card').classList.add('cracked');
     document.getElementById('vs-opp-card').classList.add('gold-glow');
-    gameState.loses++;
+    gameState.loses += 1;
   }
 
   gameState.usedPlayer.unshift({ ...myCard, win: myWin, draw: isDraw });
   gameState.usedOpp.unshift({ ...oppCard, win: !myWin && !isDraw, draw: isDraw });
-
   gameState.battleLog.push({
     battleNum: gameState.battleLog.length + 1,
     myCard: { ...myCard },
     oppCard: { ...oppCard },
     win: myWin,
-    draw: isDraw
+    draw: isDraw,
   });
 
   updateBattleUI();
   renderUsedCards();
   renderOppRemaining();
+  await wait(1600);
 
-  await new Promise(r => setTimeout(r, 2200));
-
-  // Reset
   stamp.classList.add('hidden');
   document.getElementById('vs-my-card').innerHTML = '';
   document.getElementById('vs-opp-card').innerHTML = '';
-  document.getElementById('vs-my-card').className = 'rounded-2xl overflow-hidden border-2 border-emerald-500';
-  document.getElementById('vs-opp-card').className = 'rounded-2xl overflow-hidden border-2 border-red-500';
+  document.getElementById('vs-my-card').className = '';
+  document.getElementById('vs-opp-card').className = '';
   gameState.isBattling = false;
   gameState.selectedCardId = null;
 
