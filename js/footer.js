@@ -11,7 +11,7 @@
   var st=document.createElement('style');st.textContent=css+(s.getAttribute('data-css')||'');document.head.appendChild(st);
   var f=document.createElement('footer');f.id='mbbs-footer';f.className='mf-'+mode;
   var nav='<nav aria-label="다른 게임">'+games.map(function(g){return g[0]===cur?'<span class="mf-cur" aria-current="page">'+g[1]+'</span>':'<a href="'+g[2]+'">'+g[1]+'</a>';}).join('')+'</nav>';
-  f.innerHTML=nav+'<div class="mf-copy">Copyright © '+new Date().getFullYear()+' <a href="https://www.mbbs.kr/">MBBS Inc.</a> All Rights Reserved.</div>';
+  f.innerHTML=nav+'<div class="mf-copy">Copyright © '+new Date().getFullYear()+' Ent.INCODE All Rights Reserved.</div>';
   function vis(el){return el&&el.classList.contains('active');}
   function upd(){if(!show)return;var ok=show.split(',').some(function(q){return vis(document.querySelector(q.trim()));});f.style.display=ok?'':'none';}
   function init(){document.body.appendChild(f);if(show){upd();new MutationObserver(upd).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class','style','hidden']});}}

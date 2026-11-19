@@ -111,6 +111,12 @@ test('client surfaces do not show age, the main game, picsum, or a key-prompt', 
   assert.equal(blob.includes('picsum'), false);
   assert.equal(blob.includes('tcg.mbbs.kr'), false);
   assert.equal(blob.includes('PRESS ANY KEY'), false);
-  assert.equal(blob.includes('어비스'), false);
+  const approved = '어비스게이트의 느낌을 살린 카드 배틀입니다. 여러분만의 덱을 완성해보세요!';
+  assert.equal(blob.includes(approved), true);
+  assert.equal(blob.split(approved).join('').includes('어비스'), false);
+  assert.equal(blob.includes('월드 맛보기'), false);
+  assert.equal(blob.includes('WORLD TASTE'), false);
+  assert.equal(blob.includes('MBBS Inc.'), false);
+  assert.equal(blob.includes('Ent.INCODE'), true);
   assert.equal(blob.includes('세 •'), false);
 });

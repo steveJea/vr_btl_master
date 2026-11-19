@@ -90,12 +90,8 @@ async function init() {
     cardsReady = true;
     setStartEnabled(true, '배틀 시작');
     const featured = findFeatured();
-    if (featured) {
-      const name = document.getElementById('featured-name');
-      const art = document.getElementById('featured-art');
-      if (name) name.textContent = featured.name;
-      if (art) art.alt = featured.name;
-    }
+    const art = document.getElementById('featured-art');
+    if (featured && art) art.alt = featured.name;
     renderSharedBanner();
   } catch (error) {
     console.log(JSON.stringify({ message: 'card load failed', error: String(error) }));

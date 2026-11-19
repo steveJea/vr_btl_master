@@ -141,11 +141,11 @@ export function buildShareUrl(href, record) {
   return url.toString();
 }
 
-const DEFAULT_DESCRIPTION = '본편이 열리기 전, VR 세계의 문을 잠깐 밀어 보는 카드 배틀. 10장의 덱으로 POWER를 겨루고, 이 판의 얼굴을 남깁니다.';
+const DEFAULT_DESCRIPTION = '어비스게이트의 느낌을 살린 카드 배틀입니다. 여러분만의 덱을 완성해보세요!';
 
 export function previewMeta({ search, origin, byId, featuredName, cardImage }) {
   const fallback = {
-    title: 'VR Battle Masters | 월드 맛보기',
+    title: 'VR Battle Masters',
     description: DEFAULT_DESCRIPTION,
     image: new URL('/img/og.jpg', origin).href,
     width: '1200',
