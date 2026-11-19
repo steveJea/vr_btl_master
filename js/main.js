@@ -1,91 +1,138 @@
-import { loadRealData } from './data.js';
+import { findFeatured, loadRealData } from './data.js';
+import { resolvedDefaultMode } from './config.js';
 import { gameState, resetGameState } from './state.js';
 import { dealCards } from './cards.js';
 import {
-  showScreen,
-  showDeckScreen,
+  hideCardModal,
+  renderChannels,
+  renderDeckGrid,
+  renderModeCards,
+  renderSharedBanner,
   showBattleScreen,
-  renderDeckGrid
+  showDeckScreen,
+  showRankScreen,
+  showScreen
 } from './ui.js';
+import { invalidateBattle } from './battle.js';
 import { shuffle } from './utils.js';
-import { unlockAudio, playBGM, toggleMute } from './audio.js';
+import { playBGM, toggleMute, unlockAudio } from './audio.js';
 
-// 전역 함수로 노출 (HTML onclick에서 사용)
-window.startGame = function () {
-  unlockAudio();          // 반드시 먼저
-  playBGM('select');      // 바로 선택 화면 BGM 재생 (같은 제스처 안에서)
-  showScreen('choice-screen');
+let cardsReady = false;
+
+function setStartEnabled(ready, label) {
+  const button = document.getElementById('start-btn');
+  if (!button) return;
+  button.disabled = !ready;
+  if (label) button.textContent = label;
+}
+
+window.startDefaultGame = function startDefaultGame() {
+  if (!cardsReady) return;
+  unlockAudio();
+  window.selectGameMode(resolvedDefaultMode());
 };
 
-window.selectGameMode = function (m) {
+window.selectGameMode = function selectGameMode(mode) {
+  if (!cardsReady) return;
   unlockAudio();
-  resetGameState(m);
-  gameState.playerDeck = dealCards(m);
-  gameState.opponentDeck = dealCards(m);
+  resetGameState(mode);
+  gameState.playerDeck = dealCards(mode);
+  gameState.opponentDeck = dealCards(mode);
   gameState.remainingPlayer = [...gameState.playerDeck];
   gameState.remainingOpp = [...gameState.opponentDeck];
   showDeckScreen();
 };
 
-window.changeDeck = function () {
+window.changeDeck = function changeDeck() {
   if (gameState.changeCount <= 0) return;
-  gameState.changeCount--;
+  gameState.changeCount -= 1;
   gameState.playerDeck = dealCards(gameState.mode);
-  document.getElementById('change-count').innerText = `${gameState.changeCount}/3`;
+  document.getElementById('change-count').textContent = `${gameState.changeCount}/3`;
   document.getElementById('change-btn').disabled = gameState.changeCount <= 0;
   renderDeckGrid();
 };
 
-window.confirmDeck = function () {
+window.confirmDeck = function confirmDeck() {
   unlockAudio();
   gameState.remainingPlayer = [...gameState.playerDeck];
   gameState.remainingOpp = shuffle([...gameState.opponentDeck]);
   showBattleScreen();
 };
 
-window.restartGame = function () {
-  location.reload();
+window.goHome = function goHome() {
+  invalidateBattle();
+  hideCardModal();
+  showScreen('main-screen');
 };
 
-window.toggleMuteBtn = function () {
+window.toggleMuteBtn = function toggleMuteBtn() {
   unlockAudio();
   const muted = toggleMute();
-  const btn = document.getElementById('mute-btn');
-  if (btn) {
-    btn.innerHTML = muted
-      ? '<i class="fa-solid fa-volume-xmark"></i>'
-      : '<i class="fa-solid fa-volume-high"></i>';
-    btn.classList.toggle('muted', muted);
-  }
+  const button = document.getElementById('mute-btn');
+  if (!button) return;
+  button.textContent = muted ? '소리 끔' : '소리';
+  button.classList.toggle('is-muted', muted);
+  button.setAttribute('aria-pressed', muted ? 'true' : 'false');
 };
 
+function bind(id, handler) {
+  document.getElementById(id)?.addEventListener('click', handler);
+}
+
 async function init() {
-  await loadRealData();
+  renderModeCards();
+  renderChannels(document.getElementById('channels'));
   showScreen('main-screen');
+  setStartEnabled(false, '카드를 불러오는 중');
 
-  // 키 입력으로 시작
-  document.addEventListener('keydown', (e) => {
-    if (document.getElementById('main-screen')?.classList.contains('active')) {
-      window.startGame();
+  try {
+    await loadRealData();
+    cardsReady = true;
+    setStartEnabled(true, '배틀 시작');
+    const featured = findFeatured();
+    if (featured) {
+      const name = document.getElementById('featured-name');
+      const art = document.getElementById('featured-art');
+      if (name) name.textContent = featured.name;
+      if (art) art.alt = featured.name;
     }
-  });
+    renderSharedBanner();
+  } catch (error) {
+    console.log(JSON.stringify({ message: 'card load failed', error: String(error) }));
+    setStartEnabled(false, '카드를 불러오지 못했습니다');
+  }
 
-  // 메인 화면 어디든 클릭하면 메인 BGM 시도
-  document.getElementById('main-screen')?.addEventListener('click', (e) => {
-    // START 버튼 클릭은 startGame에서 처리
-    if (e.target.closest('button')) return;
+  bind('start-btn', () => window.startDefaultGame());
+  bind('mode-other-btn', () => {
     unlockAudio();
-    playBGM('main');
+    playBGM('select');
+    showScreen('choice-screen');
+  });
+  bind('home-btn', () => window.goHome());
+  bind('mute-btn', () => window.toggleMuteBtn());
+  bind('change-btn', () => window.changeDeck());
+  bind('confirm-btn', () => window.confirmDeck());
+  bind('rank-open-btn', () => window.showRank());
+  bind('result-rank', () => window.showRank(gameState.mode));
+  bind('result-home', () => window.goHome());
+  bind('rank-back', () => window.goHome());
+  document.getElementById('card-modal')?.addEventListener('click', (event) => {
+    if (event.target.id === 'card-modal') hideCardModal();
   });
 
-  // 우클릭 방지
-  document.addEventListener('contextmenu', (e) => e.preventDefault());
+  window.showRank = (mode) => {
+    unlockAudio();
+    showRankScreen(mode);
+  };
 
-  // 개발자도구 단축키 일부 차단
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'F12') e.preventDefault();
-    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) e.preventDefault();
-    if (e.ctrlKey && e.key === 'u') e.preventDefault();
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') hideCardModal();
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const main = document.getElementById('main-screen');
+    if (!main?.classList.contains('active')) return;
+    if (event.target.closest('button, a, input')) return;
+    event.preventDefault();
+    window.startDefaultGame();
   });
 }
 

@@ -1,57 +1,43 @@
-import { CSV_URL } from './config.js';
+import { CARD_DATA_URL, FEATURED_HEROINE_NAME, INCLUDE_MALE_CARDS } from './config.js';
 
 export let cardPool = [];
 
-function parseCSV(text) {
-  const lines = text.trim().split('\n');
-  const headers = lines[0].split(',').map(h => h.trim());
+function toCard(raw) {
+  // 나이 필드는 공개 카드에 없다. 원본 CSV에만 남아 있고 여기로 오지 않는다.
+  const card = {
+    id: String(raw.id || ''),
+    name: String(raw.name || ''),
+    gender: String(raw.gender || ''),
+    region: String(raw.region || ''),
+    grade: String(raw.grade || ''),
+    class: String(raw.class || ''),
+    attribute: String(raw.attribute || ''),
+    power: Math.trunc(Number(raw.power) || 0),
+    hp: Math.trunc(Number(raw.hp) || 0),
+    atk: Math.trunc(Number(raw.atk) || 0),
+    def: Math.trunc(Number(raw.def) || 0),
+    phy: Math.trunc(Number(raw.phy) || 0),
+    men: Math.trunc(Number(raw.men) || 0),
+    mor: Math.trunc(Number(raw.mor) || 0)
+  };
+  delete card.age;
+  return card;
+}
 
-  return lines.slice(1).map(line => {
-    const vals = line.split(',');
-    const obj = {};
-    headers.forEach((h, i) => {
-      obj[h] = vals[i] ? vals[i].trim() : '';
-    });
+export function findFeatured(list = cardPool) {
+  return list.find((card) => card.name === FEATURED_HEROINE_NAME) || null;
+}
 
-    // Case-insensitive getter
-    const get = (key) => {
-      if (obj[key] !== undefined) return obj[key];
-      const lower = key.toLowerCase();
-      if (obj[lower] !== undefined) return obj[lower];
-      const upper = key.toUpperCase();
-      if (obj[upper] !== undefined) return obj[upper];
-      return '';
-    };
-
-    return {
-      id: get('id'),
-      name: get('name'),
-      gender: get('gender'),
-      age: parseInt(get('age')) || 0,
-      region: get('region'),
-      grade: get('grade'),
-      class: get('class'),
-      attribute: get('attribute'),
-      power: Math.trunc(parseFloat(get('power'))) || 0, // CSV power, 소수점 버림
-      hp: parseInt(get('HP') || get('hp')) || 0,
-      atk: parseInt(get('ATK') || get('atk')) || 0,
-      def: parseInt(get('DEF') || get('def')) || 0,
-      phy: parseInt(get('PHY') || get('phy')) || 0,
-      men: parseInt(get('MEN') || get('men')) || 0,
-      mor: parseInt(get('MOR') || get('mor')) || 0
-    };
-  });
+export function visiblePool(list = cardPool) {
+  if (INCLUDE_MALE_CARDS) return list;
+  return list.filter((card) => card.gender !== 'MALE');
 }
 
 export async function loadRealData() {
-  try {
-    const res = await fetch(CSV_URL);
-    const text = await res.text();
-    cardPool = parseCSV(text);
-    console.log(`[성공] ${cardPool.length}장 로드 완료`);
-    return cardPool;
-  } catch (e) {
-    console.error('데이터 로드 실패', e);
-    return [];
-  }
+  const res = await fetch(CARD_DATA_URL);
+  if (!res.ok) throw new Error(`card data ${res.status}`);
+  const json = await res.json();
+  cardPool = (Array.isArray(json) ? json : []).map(toCard).filter((card) => card.id);
+  console.log(JSON.stringify({ message: 'cards loaded', count: cardPool.length }));
+  return cardPool;
 }

@@ -1,0 +1,16 @@
+.git
+.github
+.gitignore
+node_modules
+.wrangler
+worker
+tests
+tools
+migrations
+package.json
+package-lock.json
+wrangler.jsonc
+bm_main.mp4
+data/cards.source.csv
+img/hero.jpg
+img/main.jpg
